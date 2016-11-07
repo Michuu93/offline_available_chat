@@ -12,6 +12,12 @@ public class ConnectController {
     public void connectServer() throws IOException {
         boolean isConnected = Connect.connect();
         //MainController.setStatus(isConnected);
+
         //nie wiem jak zmienić label ze sceny MainScreen
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("MainScreen.fxml"));
+        Parent root = loader.load();
+        MainController mainController = loader.getController();
+        mainController.setStatus(true);
+
     }
 }

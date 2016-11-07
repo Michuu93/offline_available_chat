@@ -5,6 +5,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
@@ -13,6 +14,8 @@ import java.io.IOException;
 public class MainController {
     @FXML
     private Label connectionStatus;
+    @FXML
+    private TextField messageField;
 
     @FXML
     public void menuConnect() throws IOException {
@@ -43,14 +46,22 @@ public class MainController {
         aboutStage.show();
     }
 
-    public void setStatus(boolean isConnected){
+    @FXML
+    public void setStatus(boolean isConnected) {
         if (isConnected){
             connectionStatus.setTextFill(Color.GREEN);
             connectionStatus.setText("connected");
+            System.out.println("connect"); /////test
         }
         else{
             connectionStatus.setTextFill(Color.RED);
             connectionStatus.setText("disconnected");
+            System.out.println("disconnect");  /////test
         }
+    }
+
+    @FXML
+    public void sendClicked() throws IOException {
+        messageField.clear();
     }
 }
