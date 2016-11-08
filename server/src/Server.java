@@ -8,10 +8,10 @@ public class Server{
     static ArrayList<ObjectOutputStream> outputStreams;
 
     public static void main (String[] args){
-        connecting();
+        connect();
     }
 
-    static private void connecting(){
+    static private void connect(){
         try {
             ServerSocket serverSocket = new ServerSocket(9001);
 
@@ -25,6 +25,10 @@ public class Server{
         }catch(Exception ex){
             ex.printStackTrace();
         }
+    }
+
+    private void generateRoomsList(){
+        File file = new File ("chatRooms.txt");
     }
 
 }
