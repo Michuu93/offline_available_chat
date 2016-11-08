@@ -12,6 +12,7 @@ import javafx.stage.Stage;
 import java.io.IOException;
 
 public class MainController {
+    private static Stage connectStage;
     @FXML
     private Label connectionStatus;
     @FXML
@@ -20,20 +21,21 @@ public class MainController {
     @FXML
     public void menuConnect() throws IOException {
         Parent root = FXMLLoader.load(getClass().getResource("ConnectScreen.fxml"));
-        Stage connectStage = new Stage();
+        connectStage = new Stage();
         connectStage.setTitle("Connect");
-        connectStage.setScene(new Scene(root, 300, 70));
+        connectStage.setScene(new Scene(root, 400, 70));
+        connectStage.setAlwaysOnTop(true);
+        connectStage.setResizable(false);
         connectStage.show();
-        Connect.loadConfig();
     }
 
     @FXML
-    public void menuDisconnect(){
-        Connect.disconnect();
+    public void menuDisconnect() throws IOException {
+        Main.getConnection().disconnect();
     }
 
     @FXML
-    public void menuExit(){
+    public void menuExit() {
         System.exit(0);
     }
 
@@ -43,25 +45,30 @@ public class MainController {
         Stage aboutStage = new Stage();
         aboutStage.setTitle("About");
         aboutStage.setScene(new Scene(root, 300, 150));
+        aboutStage.setAlwaysOnTop(true);
+        aboutStage.setResizable(false);
         aboutStage.show();
     }
 
     @FXML
     public void setStatus(boolean isConnected) {
-        if (isConnected){
+        if (isConnected) {
             connectionStatus.setTextFill(Color.GREEN);
             connectionStatus.setText("connected");
-            System.out.println("connect"); /////test
-        }
-        else{
+            System.out.println("connect");
+        } else {
             connectionStatus.setTextFill(Color.RED);
             connectionStatus.setText("disconnected");
-            System.out.println("disconnect");  /////test
+            System.out.println("disconnect");
         }
     }
 
     @FXML
-    public void sendClicked() throws IOException {
+    public void sendClicked() {
         messageField.clear();
+    }
+
+    public static Stage getConnectStage() {
+        return connectStage;
     }
 }
