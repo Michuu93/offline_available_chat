@@ -41,19 +41,9 @@ public class ConnectController implements Initializable {
 
     @FXML
     public void connectButtonClick() throws IOException {
-        //TODO: zrobic sprawdzanie wypełnienia pól
         server = serverField.getText();
-        if (server.isEmpty()) {
-            serverLabel.setTextFill(Color.RED);
-        } else
         port = Integer.parseInt(portField.getText());
-        if (port < 1024 | port > 65535) {
-            portLabel.setTextFill(Color.RED);
-        } else
         Main.setUserNick(nickField.getText());
-        if (Main.getUserNick() == null) {
-            nickLabel.setTextFill(Color.RED);
-        } else
         System.out.println("Server: " + server + " Port: " + port + " Nick: " + Main.getUserNick());
         Main.getConnection().connect(server, port);
 
@@ -63,7 +53,7 @@ public class ConnectController implements Initializable {
         } else {
             serverLabel.setTextFill(Color.RED);
             portLabel.setTextFill(Color.RED);
-            System.out.println("Server IP or Port error!");
+            System.out.println("Server IP or Port incorrect!");
         }
     }
 

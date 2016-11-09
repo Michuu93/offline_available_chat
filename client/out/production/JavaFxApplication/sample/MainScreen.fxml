@@ -53,5 +53,5 @@
     <Label layoutX="604.0" layoutY="36.0" text="Rooms:" />
     <Label layoutX="604.0" layoutY="256.0" text="Users:" />
     <Label layoutX="604.0" layoutY="477.0" text="Connect status:" />
-    <Label fx:id="connectionStatus" layoutX="690.0" layoutY="477.0" text="disconnected" textFill="RED" />
+    <Label fx:id="connectionStatus" layoutX="690.0" layoutY="477.0" textFill="RED" />
 </Pane>

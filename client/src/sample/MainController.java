@@ -55,11 +55,11 @@ public class MainController {
         if (isConnected) {
             connectionStatus.setTextFill(Color.GREEN);
             connectionStatus.setText("connected");
-            System.out.println("connect");
+            System.out.println("Set Status Connected");
         } else {
             connectionStatus.setTextFill(Color.RED);
             connectionStatus.setText("disconnected");
-            System.out.println("disconnect");
+            System.out.println("Set Status Disconnected");
         }
     }
 
