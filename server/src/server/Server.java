@@ -1,3 +1,5 @@
+package server;
+
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -15,7 +17,6 @@ public class Server {
     static private void connect() {
         try {
             ServerSocket serverSocket = new ServerSocket(9001);
-
             while (true) {
                 Socket clientSocket = serverSocket.accept();
                 ObjectOutputStream outStream = new ObjectOutputStream(clientSocket.getOutputStream());
@@ -28,6 +29,7 @@ public class Server {
         }
     }
 
+    // todo: wysylanie listy pokoi do klienta
     private void loadRooms() {
         try {
             File file = new File("chatRooms.txt");
@@ -40,4 +42,6 @@ public class Server {
             e.printStackTrace();
         }
     }
+
+
 }
