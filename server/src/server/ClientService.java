@@ -25,9 +25,10 @@ public class ClientService implements Runnable{
 
     private void read(){
         //todo: czytanie wiadomosci oraz nazwy pokoju z pakietu
-        Object packet;
+        Object object;
         try{
-            while ((packet = inStream.readObject()) != null){
+            while ((object = inStream.readObject()) != null){
+                Packet packet = (Packet) object;
                 serialize(packet);
                 sendToEveryone(packet);
             }
