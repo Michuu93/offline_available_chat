@@ -36,18 +36,14 @@ public class Connection {
     }
 
     public void getRoomsList() throws IOException, ClassNotFoundException {
-        ArrayList<String> roomsList = new ArrayList<String>();
-        roomsList = (ArrayList<String>) inStream.readObject();
+        ArrayList<String> roomsList = (ArrayList<String>) inStream.readObject();
         Main.setChatRoomsList(roomsList);
-
-        //wyświetlenie listy test
-        Main.getChatRoomsList().forEach((a) -> System.out.println(a));
+        Main.getMainController().fillRoomsList(roomsList);
     }
 
     public boolean isConnected() {
         return connected;
     }
-
 
     public ObjectOutputStream getOutStream() {
         return outStream;

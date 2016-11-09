@@ -48,6 +48,7 @@ public class ConnectController implements Initializable {
         Main.getConnection().connect(server, port);
 
         if (Main.getConnection().isConnected()) {
+            startReaderThread();
             recentSave();
             MainController.getConnectStage().close();
         } else {
@@ -75,6 +76,12 @@ public class ConnectController implements Initializable {
         writer.println(portField.getText());
         writer.print(nickField.getText());
         writer.close();
+    }
+
+    public void startReaderThread(){
+        Runnable threadJob = new ReaderThread();
+        Thread readerThread = new Thread(threadJob);
+        readerThread.start();
     }
 
 }

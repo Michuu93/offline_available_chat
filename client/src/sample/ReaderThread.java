@@ -1,5 +1,6 @@
 package sample;
 
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -8,31 +9,24 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
+import static java.lang.Thread.sleep;
+
 public class ReaderThread implements Runnable {
     @Override
     public void run() {
-//        FXMLLoader loader = new FXMLLoader(getClass().getResource("MainScreen.fxml"));
-//        try {
-//            Parent root = loader.load();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        MainController controller = loader.getController();
-//        if (controller != null)
-//            controller.setStatus(Main.getConnection().isConnected());
-//        System.out.println(controller);
-
         while (true) {
-
             //Sleep do testów
             try {
-                Main.getReaderThread().sleep(2000);
+                sleep(2000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
             //
 
             System.out.println("Connected = " + Main.getConnection().isConnected());
+            System.out.println(Main.getMainController());
+            Platform.runLater(() -> Main.getMainController().setStatus(Main.getConnection().isConnected()));
+
 
             if (Main.getConnection().isConnected()) {
 
@@ -61,8 +55,6 @@ public class ReaderThread implements Runnable {
 //                }
 
                 //Status update
-
-
             }
         }
 
