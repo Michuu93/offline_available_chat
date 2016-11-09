@@ -17,7 +17,7 @@ public class ClientService implements Runnable{
             Socket clientSocket = socket;
             inStream = new ObjectInputStream(clientSocket.getInputStream());
         }catch (Exception ex){
-            ex.printStackTrace();
+
         }
     }
     @Override
@@ -39,9 +39,9 @@ public class ClientService implements Runnable{
         Object object;
         try{
             while ((object = inStream.readObject()) != null){
-                Packet packet = (Packet) object;
-                serialize(packet);
-                sendToAll(packet);
+                MessagePacket messagePacket = (MessagePacket) object;
+                sendToAll(messagePacket);
+                serialize(messagePacket);
             }
         }catch (Exception ex){
             ex.printStackTrace();

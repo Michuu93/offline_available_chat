@@ -32,8 +32,9 @@ public class Server {
     }
 
     private void loadRooms() {
+        String filename = "src\\chatRooms.txt";
         try {
-            File file = new File("chatRooms.txt");
+            File file = new File(filename);
             BufferedReader reader = new BufferedReader(new FileReader(file));
             String line = null;
             chatRoomsList.add("Waiting Room");

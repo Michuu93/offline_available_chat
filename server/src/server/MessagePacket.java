@@ -2,13 +2,13 @@ package server;
 
 import java.io.Serializable;
 
-public class Packet implements Serializable {
+public class MessagePacket implements Serializable {
     private String message;
     private String room;
 
-    Packet(){}
+    MessagePacket(){}
 
-    Packet(String message, String room){
+    MessagePacket(String message, String room){
         this.message = message;
         this.room = room;
     }
