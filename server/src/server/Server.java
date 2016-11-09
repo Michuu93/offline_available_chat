@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 public class Server {
 
-    ArrayList<ObjectOutputStream> outputStreams;
+    ArrayList<ObjectOutputStream> outputStreams = new ArrayList<ObjectOutputStream>();
     ArrayList<String> chatRoomsList = new ArrayList<String>();
     Socket clientSocket;
 
@@ -23,6 +23,7 @@ public class Server {
                 loadRooms();
                 ObjectOutputStream outStream = new ObjectOutputStream(clientSocket.getOutputStream());
                 outputStreams.add(outStream);
+                deliverRoomsList(outStream);
                 Thread thread = new Thread(new ClientService(clientSocket));
                 thread.start();
             }
@@ -46,5 +47,13 @@ public class Server {
         }
     }
 
+    private void deliverRoomsList(ObjectOutputStream client) {
+        try {
+            ObjectOutputStream outStream = (ObjectOutputStream) client;
+            outStream.writeObject(chatRoomsList);
+        }catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
 }
