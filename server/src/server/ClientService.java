@@ -1,5 +1,6 @@
-import com.sun.deploy.util.SessionState;
+package server;
 
+import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
@@ -19,14 +20,16 @@ public class ClientService implements Runnable{
     }
     @Override
     public void run() {
-        reading();
+        read();
     }
 
-    private void reading(){
-        Object message = null;
+    private void read(){
+        //todo: czytanie wiadomosci oraz nazwy pokoju z pakietu
+        Object packet;
         try{
-            while ((message = inStream.readObject()) != null){
-                sendToEveryone(message);
+            while ((packet = inStream.readObject()) != null){
+                serialize(packet);
+                sendToEveryone(packet);
             }
         }catch (Exception ex){
             ex.printStackTrace();
@@ -46,5 +49,16 @@ public class ClientService implements Runnable{
         }
     }
 
+    private void serialize(Object packet){
+        try {
+            FileOutputStream fileOutputStream = null;
+            fileOutputStream = new FileOutputStream("package.ser");
+            ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
+            objectOutputStream.writeObject(packet);
+            objectOutputStream.close();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
 
 }
