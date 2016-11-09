@@ -22,17 +22,7 @@ public class ClientService implements Runnable{
     }
     @Override
     public void run() {
-        deliverRoomsList();
         read();
-    }
-
-    private void deliverRoomsList() {
-        try {
-            ObjectOutputStream outStream = (ObjectOutputStream) server.clientSocket.getOutputStream();
-            outStream.writeObject(server.chatRoomsList);
-        }catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     private void read(){
