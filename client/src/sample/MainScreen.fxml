@@ -30,7 +30,7 @@
             </Menu>
         </menus>
     </MenuBar>
-    <TextField fx:id="messageField" layoutX="2.0" layoutY="473.0" prefHeight="25.0" prefWidth="518.0" />
+    <TextField fx:id="messageField" layoutX="2.0" layoutY="473.0" onKeyPressed="#onEnter" prefHeight="25.0" prefWidth="518.0" />
     <Button layoutX="522.0" layoutY="473.0" mnemonicParsing="false" onAction="#sendClicked" prefWidth="76.0" text="Send" />
     <TabPane fx:id="tabPane" layoutY="27.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="444.0" prefWidth="600.0" tabClosingPolicy="UNAVAILABLE">
         <tabs>
