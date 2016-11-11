@@ -14,6 +14,7 @@ public class Main extends Application {
     private static ArrayList<String> chatRoomsList = new ArrayList<String>();
     private static ArrayList<String> joinedChatRoomsList = new ArrayList<String>();
     private static MainController mainController;
+    private static ConnectController connectController;
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -54,6 +55,14 @@ public class Main extends Application {
 
     public static void setMainController(MainController mainController) {
         Main.mainController = mainController;
+    }
+
+    public static ConnectController getConnectController() {
+        return connectController;
+    }
+
+    public static void setConnectController(ConnectController connectController) {
+        Main.connectController = connectController;
     }
 
     public static void main(String[] args) {

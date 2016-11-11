@@ -30,7 +30,7 @@ public class MainController {
         Parent root = FXMLLoader.load(getClass().getResource("ConnectScreen.fxml"));
         connectStage = new Stage();
         connectStage.setTitle("Connect");
-        connectStage.setScene(new Scene(root, 400, 70));
+        connectStage.setScene(new Scene(root, 400, 80));
         connectStage.setAlwaysOnTop(true);
         connectStage.setResizable(false);
         connectStage.show();

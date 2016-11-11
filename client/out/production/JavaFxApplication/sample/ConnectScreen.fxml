@@ -5,7 +5,7 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.Pane?>
 
-<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="70.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/8.0.66" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.ConnectController">
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="80.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/8.0.66" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.ConnectController">
    <children>
       <Button layoutX="326.0" layoutY="31.0" mnemonicParsing="false" onAction="#connectButtonClick" text="Connect" />
       <Label fx:id="serverLabel" layoutX="14.0" layoutY="14.0" text="Server:" />
@@ -14,5 +14,6 @@
       <TextField fx:id="portField" layoutX="141.0" layoutY="31.0" prefHeight="25.0" prefWidth="52.0" />
       <Label fx:id="nickLabel" layoutX="200.0" layoutY="14.0" text="Nick:" />
       <TextField fx:id="nickField" layoutX="200.0" layoutY="31.0" prefHeight="25.0" prefWidth="120.0" />
+      <Label fx:id="connectLabel" layoutX="14.0" layoutY="58.0" text=" " />
    </children>
 </Pane>

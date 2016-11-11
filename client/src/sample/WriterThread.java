@@ -10,7 +10,7 @@ public class WriterThread implements Runnable {
 
     public WriterThread(MessagePacket message) {
             try {
-                writer = Main.getConnection().getOutStream();
+                writer = new ObjectOutputStream(Main.getConnection().getSocket().getOutputStream());
                 writer.writeObject(message);
                 writer.flush();
                 //writer.close();
