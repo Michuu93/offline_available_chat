@@ -6,6 +6,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
@@ -81,6 +82,14 @@ public class MainController {
     public void clearRoomsList() {
         roomsListView.getItems().clear();
         roomsListView.refresh();
+    }
+
+    @FXML
+    public void onEnter(KeyEvent e){
+        if(e.getCode().toString().equals("ENTER"))
+        {
+            sendClicked();
+        }
     }
 
     @FXML

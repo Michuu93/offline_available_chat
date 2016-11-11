@@ -25,13 +25,15 @@ public class ClientService implements Runnable{
     private void read(){
         Object object;
         Boolean complete = true;
-        while (complete) {
+        while (true) {
             try {
-                if ((object = reader.readObject()) != null) {
-                    MessagePacket messagePacket = (MessagePacket) object;
-                    System.out.println("Read message from client: " + messagePacket.getRoom() + ": " + messagePacket.getMessage());
-                    Server.sendToAll(messagePacket);
-                    //serialize(messagePacket);
+                if (complete) {
+                    if ((object = reader.readObject()) != null) {
+                        MessagePacket messagePacket = (MessagePacket) object;
+                        System.out.println("Read message from client: " + messagePacket.getRoom() + ": " + messagePacket.getMessage());
+                        Server.sendToAll(messagePacket);
+                        //serialize(messagePacket);
+                    }
                 }
             }catch (EOFException e){
                 complete = false;

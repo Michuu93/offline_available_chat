@@ -4,7 +4,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.paint.Color;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -21,12 +20,6 @@ public class ConnectController implements Initializable {
     private TextField portField;
     @FXML
     private TextField nickField;
-    @FXML
-    private Label serverLabel;
-    @FXML
-    private Label portLabel;
-    @FXML
-    private Label nickLabel;
     @FXML
     private Label connectLabel;
 
@@ -61,7 +54,7 @@ public class ConnectController implements Initializable {
         if (reader.hasNextLine()) serverField.setText(reader.nextLine());
         else serverField.setText("127.0.0.1");
         if (reader.hasNextLine()) portField.setText(reader.nextLine());
-        else portField.setText("666");
+        else portField.setText("9001");
         if (reader.hasNextLine()) nickField.setText(reader.nextLine());
         else nickField.setText("anonymous");
         reader.close();
