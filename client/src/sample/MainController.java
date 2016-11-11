@@ -107,17 +107,29 @@ public class MainController {
         if (click.getClickCount() == 2) {
             String currentItemSelected = (String) roomsListView.getSelectionModel().getSelectedItem();
             if ((currentItemSelected != null) && !Main.getJoinedChatRoomsList().contains(currentItemSelected)) {
-                Tab newTabTest = new Tab();
-                newTabTest.setText(currentItemSelected);
-                tabPane.getTabs().add(newTabTest);
-                newTabTest.setId(currentItemSelected);
-                tabPane.getSelectionModel().select(newTabTest);
-                TextArea newTextAreaTest = new TextArea();
-                newTextAreaTest.setEditable(false);
-                newTabTest.setContent(newTextAreaTest);
-                Main.getJoinedChatRoomsList().add(currentItemSelected);
+                joinRoom(currentItemSelected);
             }
         }
+    }
+
+    public void joinRoom (String joinRoom){
+        Tab newTab = new Tab();
+        newTab.setText(joinRoom);
+        newTab.setId(joinRoom);
+        tabPane.getTabs().add(newTab);
+        tabPane.getSelectionModel().select(newTab);
+
+        ScrollPane newScrollPane = new ScrollPane();
+        newScrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
+        newTab.setContent(newScrollPane);
+
+        TextArea newTextArea = new TextArea();
+        newTextArea.setEditable(false);
+        newTextArea.setMinWidth(586);
+        newTextArea.setMinHeight(416);
+        newScrollPane.setContent(newTextArea);
+
+        Main.getJoinedChatRoomsList().add(joinRoom);
     }
 
     public void closeTabs() {

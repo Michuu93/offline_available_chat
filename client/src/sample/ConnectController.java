@@ -43,20 +43,15 @@ public class ConnectController implements Initializable {
     }
 
     @FXML
-    public void connectButtonClick() throws IOException {
+    public void connectButtonClick() throws IOException, ClassNotFoundException {
         server = serverField.getText();
         port = Integer.parseInt(portField.getText());
         Main.setUserNick(nickField.getText());
         Main.getConnection().connect(server, port);
-        System.out.println("Server: " + server + " Port: " + port + " Nick: " + Main.getUserNick());
 
         if (Main.getConnection().isConnected()) {
             recentSave();
             MainController.getConnectStage().close();
-        } else {
-            serverLabel.setTextFill(Color.RED);
-            portLabel.setTextFill(Color.RED);
-            System.out.println("Server IP or Port incorrect!");
         }
     }
 
