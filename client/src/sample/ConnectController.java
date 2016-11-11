@@ -27,6 +27,8 @@ public class ConnectController implements Initializable {
     private Label portLabel;
     @FXML
     private Label nickLabel;
+    @FXML
+    private Label connectLabel;
 
     public String server;
     public int port;
@@ -34,6 +36,7 @@ public class ConnectController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         try {
             recentLoad();
+            Main.setConnectController(this);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -75,5 +78,9 @@ public class ConnectController implements Initializable {
         writer.println(portField.getText());
         writer.print(nickField.getText());
         writer.close();
+    }
+
+    public void setConnectLabel(String information){
+        connectLabel.setText(information);
     }
 }
