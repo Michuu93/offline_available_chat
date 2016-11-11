@@ -1,25 +1,20 @@
 package sample;
 
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import common.MessagePacket;
 
 import java.io.IOException;
-import java.io.Reader;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.ResourceBundle;
 
 public class MainController {
+    private Thread writerThread;
     private static Stage connectStage;
     @FXML
     private Label connectionStatus;
@@ -27,6 +22,8 @@ public class MainController {
     private TextField messageField;
     @FXML
     private ListView roomsListView;
+    @FXML
+    private TabPane tabPane;
 
     @FXML
     public void menuConnect() throws IOException {
@@ -69,30 +66,63 @@ public class MainController {
         if (isConnected) {
             connectionStatus.setTextFill(Color.GREEN);
             connectionStatus.setText("connected");
-            System.out.println("Set Status Connected");
         } else {
             connectionStatus.setTextFill(Color.RED);
             connectionStatus.setText("disconnected");
-            System.out.println("Set Status Disconnected");
         }
     }
 
     @FXML
-    public void fillRoomsList(ArrayList<String> roomsList) {
+    public void fillRoomsList() {
         roomsListView.setItems(FXCollections.observableList(Main.getChatRoomsList()));
     }
 
     @FXML
+    public void clearRoomsList() {
+        roomsListView.getItems().clear();
+        roomsListView.refresh();
+    }
+
+    @FXML
     public void sendClicked() {
-        messageField.clear();
+        if (Main.getConnection().isConnected()) {
+            String roomID = tabPane.getSelectionModel().getSelectedItem().getText();
+            String message = messageField.getText();
+            MessagePacket msgPacket = new MessagePacket();
+            msgPacket.setMessage(message);
+            msgPacket.setRoom(roomID);
+            Runnable writerJob = new WriterThread(msgPacket);
+            writerThread = new Thread(writerJob);
+            writerThread.setName("Writer Thread");
+            writerThread.start();
+            messageField.clear();
+        } else {
+            System.out.println("Nie można wysłać wiadomośći, nie jesteś połączony!");
+            messageField.clear();
+        }
+
     }
 
     public void roomClick(MouseEvent click) {
-
         if (click.getClickCount() == 2) {
             String currentItemSelected = (String) roomsListView.getSelectionModel().getSelectedItem();
-            System.out.println("Wybrano pokój: " + currentItemSelected);
+            if ((currentItemSelected != null) && !Main.getJoinedChatRoomsList().contains(currentItemSelected)) {
+                Tab newTabTest = new Tab();
+                newTabTest.setText(currentItemSelected);
+                tabPane.getTabs().add(newTabTest);
+                newTabTest.setId(currentItemSelected);
+                tabPane.getSelectionModel().select(newTabTest);
+                TextArea newTextAreaTest = new TextArea();
+                newTextAreaTest.setEditable(false);
+                newTabTest.setContent(newTextAreaTest);
+                Main.getJoinedChatRoomsList().add(currentItemSelected);
+            }
         }
+    }
+
+    public void closeTabs() {
+        int tabPaneSize = tabPane.getTabs().size();
+        tabPane.getTabs().remove(1, tabPaneSize);
     }
 
     public static Stage getConnectStage() {

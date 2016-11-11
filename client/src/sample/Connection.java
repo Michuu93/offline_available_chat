@@ -1,31 +1,35 @@
 package sample;
 
+import javafx.application.Platform;
+
 import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
 
 public class Connection {
-    private static Connection connection;
     private boolean connected = false;
     private Socket socket = null;
     private ObjectOutputStream outStream = null;
     private ObjectInputStream inStream = null;
+    private Runnable readerJob = new ReaderThread();
+    private Thread readerThread;
 
     public void connect(String server, int port) throws IOException {
         try {
             socket = new Socket(server, port);
-            InputStreamReader stream = new InputStreamReader(socket.getInputStream());
             outStream = new ObjectOutputStream(socket.getOutputStream());
             inStream = new ObjectInputStream(socket.getInputStream());
             getRoomsList();
-            connected = true;
+            System.out.println("Connected to " + server + ":" + port);
+            setConnected(true);
+            startThreads();
         } catch (IOException e) {
-            //e.printStackTrace();
-            System.out.println("connection problem!");
-            connected = false;
+            e.printStackTrace();
+            System.out.println("Connecting problem!");
+            setConnected(false);
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
-            System.out.println("getRoomList error!");
+            System.out.println("Getting rooms list error!");
         }
     }
 
@@ -33,14 +37,22 @@ public class Connection {
         if (isConnected()) {
             inStream.close();
             outStream.close();
-            connected = false;
+            Main.getMainController().clearRoomsList();
+            Main.getChatRoomsList().clear();
+            Main.getJoinedChatRoomsList().clear();
+            Main.getMainController().closeTabs();
+            setConnected(false);
         }
     }
 
     public void getRoomsList() throws IOException, ClassNotFoundException {
-        ArrayList<String> roomsList = (ArrayList<String>) inStream.readObject();
-        Main.setChatRoomsList(roomsList);
-        Main.getMainController().fillRoomsList(roomsList);
+        Main.setChatRoomsList((ArrayList<String>) inStream.readObject());
+        Main.getMainController().fillRoomsList();
+    }
+
+    public void setConnected(boolean connected) {
+        this.connected = connected;
+        Main.getMainController().setStatus(connected);
     }
 
     public boolean isConnected() {
@@ -55,4 +67,10 @@ public class Connection {
         return inStream;
     }
 
+    public void startThreads() {
+        System.out.println("Starting Reader and Writer threads.");
+        readerThread = new Thread(readerJob);
+        readerThread.setName("Reader Thread");
+        readerThread.start();
+    }
 }
