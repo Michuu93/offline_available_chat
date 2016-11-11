@@ -1,36 +1,43 @@
 package server;
 
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.net.Socket;
 
 public class Client {
 
-    private ObjectOutputStream clientOutputStream;
+    private Socket Socket;
     private String room;
+    private ObjectOutputStream outputStream;
+    private ObjectInputStream inputStream;
+
 
     Client(){
 
     }
 
-    Client(ObjectOutputStream clientOutputStream){
-        this.clientOutputStream = clientOutputStream;
+    Client(Socket clientSocket){
+        this.Socket = clientSocket;
+        //this.outputStream = outputStream;
+        //this.inputStream = inputStream;
         this.room = "Waiting room";
     }
 
-    Client(ObjectOutputStream clientOutputStream, String room){
-        this.clientOutputStream = clientOutputStream;
-        this.room = room;
-    }
-
-    public ObjectOutputStream getClientOutputStream() {
-        return clientOutputStream;
-    }
-
-    public void setClientOutputStream(ObjectOutputStream clientOutputStream) {
-        this.clientOutputStream = clientOutputStream;
+    public Socket getSocket() {
+        return Socket;
     }
 
     public String getRoom() {
         return room;
+    }
+
+    public ObjectOutputStream getOutputStream() {
+        return outputStream;
+    }
+
+    public ObjectInputStream getInputStream() {
+        return inputStream;
     }
 
     public void setRoom(String room) {
