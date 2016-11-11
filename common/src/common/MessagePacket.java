@@ -1,4 +1,4 @@
-package server;
+package common;
 
 import java.io.Serializable;
 
@@ -6,9 +6,9 @@ public class MessagePacket implements Serializable {
     private String message;
     private String room;
 
-    MessagePacket(){}
+    public void MessagePacket(){}
 
-    MessagePacket(String message, String room){
+    public void MessagePacket(String message, String room){
         this.message = message;
         this.room = room;
     }
