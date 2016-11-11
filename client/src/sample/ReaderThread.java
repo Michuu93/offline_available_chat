@@ -12,12 +12,14 @@ public class ReaderThread implements Runnable {
     @Override
     public void run() {
         reader = Main.getConnection().getInStream();
-        while (true) {s
+        while (true) {
             //Read from server
             try {
                 if (reader.readObject() != null) {
-                    MessagePacket msg = (MessagePacket) Main.getConnection().getInStream().readObject();
-                    System.out.println("Odebrano: ID pokoju: " + msg.getRoom() + " Wiadomość: " + msg.getMessage());
+                    String mesg = (String) reader.readObject();
+                    System.out.println("Odebrano " + mesg);
+                    //MessagePacket msg = (MessagePacket) reader.readObject()
+                    //System.out.println("Odebrano: ID pokoju: " + msg.getRoom() + " Wiadomość: " + msg.getMessage());
                 }
             } catch (IOException e) {
                 e.printStackTrace();
