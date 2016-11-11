@@ -9,9 +9,8 @@ public class WriterThread implements Runnable {
 
     public WriterThread(MessagePacket message) {
             try {
-                ObjectOutputStream writer = new ObjectOutputStream(Main.getConnection().getSocket().getOutputStream());
-                writer.writeObject(message);
-                writer.flush();
+                Main.getConnection().getWriter().writeObject(message);
+                Main.getConnection().getWriter().flush();
                 System.out.println("Wysłano do pokoju: " + message.getRoom() + "\nwiadomość: " + message.getMessage());
 
                 //zamykanie wątku, nie wiem czy działa

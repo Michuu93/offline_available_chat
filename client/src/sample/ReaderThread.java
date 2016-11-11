@@ -8,23 +8,15 @@ import java.io.ObjectInputStream;
 import java.net.SocketException;
 
 public class ReaderThread implements Runnable {
-    private ObjectInputStream reader;
     private Object received;
 
     @Override
     public void run() {
-        //Getting input stream
-        try {
-            reader = new ObjectInputStream(Main.getConnection().getSocket().getInputStream());
-        } catch (IOException e) {
-            System.out.println("Disconnect!");
-            killThread();
-        }
-
+        System.out.println("reader");
         while (true) {
             //Read from server
             try {
-                if (Main.getConnection().isConnected() && ((received = reader.readObject()) != null)) {
+                if (Main.getConnection().isConnected() && ((received = Main.getConnection().getReader().readObject()) != null)) {
                     if (received instanceof MessagePacket) {
                         System.out.println("Odebrano MessagePacket");
                         MessagePacket msg = (MessagePacket) received;
