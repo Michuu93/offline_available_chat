@@ -7,8 +7,8 @@ import java.util.ArrayList;
 
 public class Server {
 
-    ArrayList<Client> clients = new ArrayList<Client>();
-    ArrayList<String> chatRoomsList = new ArrayList<String>();
+    ArrayList<Client> clients = new ArrayList<>();
+    ArrayList<String> chatRoomsList = new ArrayList<>();
     Socket clientSocket;
 
     public static void main(String[] args) {
