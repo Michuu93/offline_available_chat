@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 public class Server {
 
-    ArrayList<ObjectOutputStream> outputStreams = new ArrayList<ObjectOutputStream>();
+    ArrayList<Client> clients = new ArrayList<Client>();
     ArrayList<String> chatRoomsList = new ArrayList<String>();
     Socket clientSocket;
 
@@ -21,9 +21,11 @@ public class Server {
             while (true) {
                 Socket clientSocket = serverSocket.accept();
                 loadRooms();
-                ObjectOutputStream outStream = new ObjectOutputStream(clientSocket.getOutputStream());
-                outputStreams.add(outStream);
-                deliverRoomsList(outStream);
+                ObjectOutputStream clientOutputStream = new ObjectOutputStream(clientSocket.getOutputStream());
+                //TODO: przypisywanie pokoju
+                Client client = new Client(clientOutputStream);
+                clients.add(client);
+                deliverRoomsList(clientOutputStream);
                 Thread thread = new Thread(new ClientService(clientSocket));
                 thread.start();
             }
