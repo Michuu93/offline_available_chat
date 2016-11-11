@@ -48,7 +48,8 @@ public class MainController {
     }
 
     @FXML
-    public void menuExit() {
+    public void menuExit() throws IOException {
+        Main.getConnection().disconnect();
         System.exit(0);
     }
 

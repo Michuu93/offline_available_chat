@@ -30,9 +30,11 @@ public class Connection {
     }
 
     public void disconnect() throws IOException {
-        inStream.close();
-        outStream.close();
-        connected = false;
+        if (isConnected()) {
+            inStream.close();
+            outStream.close();
+            connected = false;
+        }
     }
 
     public void getRoomsList() throws IOException, ClassNotFoundException {

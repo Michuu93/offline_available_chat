@@ -1,15 +1,8 @@
 package sample;
 
 import javafx.application.Platform;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-
 import static java.lang.Thread.sleep;
+import common.MessagePacket;
 
 public class ReaderThread implements Runnable {
     @Override
