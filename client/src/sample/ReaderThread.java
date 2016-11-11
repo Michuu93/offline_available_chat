@@ -1,53 +1,30 @@
 package sample;
 
 import javafx.application.Platform;
-import static java.lang.Thread.sleep;
 import common.MessagePacket;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+
 public class ReaderThread implements Runnable {
+    private ObjectInputStream reader;
+
     @Override
     public void run() {
-        while (true) {
-            //Sleep do testów
+        reader = Main.getConnection().getInStream();
+        while (true) {s
+            //Read from server
             try {
-                sleep(2000);
-            } catch (InterruptedException e) {
+                if (reader.readObject() != null) {
+                    MessagePacket msg = (MessagePacket) Main.getConnection().getInStream().readObject();
+                    System.out.println("Odebrano: ID pokoju: " + msg.getRoom() + " Wiadomość: " + msg.getMessage());
+                }
+            } catch (IOException e) {
                 e.printStackTrace();
-            }
-            //
-
-            System.out.println("Connected = " + Main.getConnection().isConnected());
-            System.out.println(Main.getMainController());
-            Platform.runLater(() -> Main.getMainController().setStatus(Main.getConnection().isConnected()));
-
-
-            if (Main.getConnection().isConnected()) {
-
-                //test
-                MessagePacket msg = new MessagePacket();
-                msg.setRoom("Waiting room");
-                msg.setMessage("Wiadomość testowa");
-
-//                //Send to server
-//                ObjectOutputStream outStream = Main.getConnection().getOutStream();
-//                try {
-//                    outStream.writeObject(msg);
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//
-//                //Read from server
-//                ObjectInputStream inStream = Main.getConnection().getInStream();
-//                try {
-//                    msg = (MessagePacket) inStream.readObject();
-//                    System.out.println("ID pokoju: " + msg.getRoom() + " Wiadomość: " + msg.getMessage());
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                } catch (ClassNotFoundException e) {
-//                    e.printStackTrace();
-//                }
-
-                //Status update
+                System.out.println("Reader error!");
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+                System.out.println("Reader error! Class Not Found");
             }
         }
 

@@ -9,9 +9,10 @@ import javafx.stage.Stage;
 import java.util.ArrayList;
 
 public class Main extends Application {
-    private static Connection connection = new Connection();;
+    private static Connection connection = new Connection();
     private static String userNick;
     private static ArrayList<String> chatRoomsList = new ArrayList<String>();
+    private static ArrayList<String> joinedChatRoomsList = new ArrayList<String>();
     private static MainController mainController;
 
     @Override
@@ -41,6 +42,10 @@ public class Main extends Application {
 
     public static void setChatRoomsList(ArrayList<String> chatRoomsList) {
         Main.chatRoomsList = chatRoomsList;
+    }
+
+    public static ArrayList<String> getJoinedChatRoomsList() {
+        return joinedChatRoomsList;
     }
 
     public static MainController getMainController() {
