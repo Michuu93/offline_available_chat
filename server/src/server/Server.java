@@ -29,7 +29,7 @@ public class Server {
             }
         } catch (Exception ex) {
             ex.printStackTrace();
-        }
+        } 
     }
 
     private void loadRooms() {
