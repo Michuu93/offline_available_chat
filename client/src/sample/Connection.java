@@ -11,10 +11,14 @@ public class Connection {
     private Runnable readerJob = new ReaderThread();
     private Thread readerThread;
     private boolean connected = false;
+    private ObjectInputStream reader;
+    ObjectOutputStream writer;
 
     public void connect(String server, int port) throws IOException, ClassNotFoundException {
         try {
             socket = new Socket(server, port);
+            reader = new ObjectInputStream(socket.getInputStream());
+            writer = new ObjectOutputStream(socket.getOutputStream());
             System.out.println("Connected to " + server + ":" + port);
             setConnected(true);
             getRoomsList();
@@ -34,11 +38,20 @@ public class Connection {
             Main.getChatRoomsList().clear();
             Main.getJoinedChatRoomsList().clear();
             Main.getMainController().closeTabs();
+            System.out.println("Disconnect!");
         }
     }
 
     public Socket getSocket() {
         return socket;
+    }
+
+    public ObjectInputStream getReader() {
+        return reader;
+    }
+
+    public ObjectOutputStream getWriter() {
+        return writer;
     }
 
     public boolean isConnected() {
@@ -58,7 +71,6 @@ public class Connection {
     }
 
     public void getRoomsList() throws IOException, ClassNotFoundException {
-        ObjectInputStream reader = new ObjectInputStream(Main.getConnection().getSocket().getInputStream());
         Main.setChatRoomsList((ArrayList<String>) reader.readObject());
         Main.getMainController().fillRoomsList();
     }
