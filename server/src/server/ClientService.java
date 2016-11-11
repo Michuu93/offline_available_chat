@@ -5,7 +5,6 @@ import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.util.Iterator;
 
 public class ClientService implements Runnable{
 
@@ -17,7 +16,7 @@ public class ClientService implements Runnable{
             Socket clientSocket = socket;
             inStream = new ObjectInputStream(clientSocket.getInputStream());
         }catch (Exception ex){
-
+            ex.printStackTrace();
         }
     }
     @Override
@@ -30,7 +29,7 @@ public class ClientService implements Runnable{
         try{
             while ((object = inStream.readObject()) != null){
                 MessagePacket messagePacket = (MessagePacket) object;
-                sendToAll(messagePacket.getMessage());
+                sendToAll(messagePacket);
                 serialize(messagePacket);
             }
         }catch (Exception ex){
