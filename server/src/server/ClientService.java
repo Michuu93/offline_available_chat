@@ -1,7 +1,6 @@
 package server;
 
 import common.MessagePacket;
-
 import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -31,7 +30,7 @@ public class ClientService implements Runnable{
         try{
             while ((object = inStream.readObject()) != null){
                 MessagePacket messagePacket = (MessagePacket) object;
-                sendToAll(messagePacket);
+                sendToAll(messagePacket.getMessage());
                 serialize(messagePacket);
             }
         }catch (Exception ex){
@@ -40,10 +39,9 @@ public class ClientService implements Runnable{
     }
 
     private void sendToAll(Object message) {
-        Iterator iterator = server.outputStreams.iterator();
-        while (iterator.hasNext()){
+        for (Client client: server.clients) {
             try{
-                ObjectOutputStream outStream = (ObjectOutputStream)iterator.next();
+                ObjectOutputStream outStream = (ObjectOutputStream) client.getClientOutputStream();
                 outStream.writeObject(message);
             }catch(Exception ex){
                 ex.printStackTrace();
