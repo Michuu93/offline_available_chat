@@ -4,6 +4,7 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class Server {
 
@@ -24,8 +25,9 @@ public class Server {
             while (true) {
                 Socket clientSocket = serverSocket.accept();
                 ObjectOutputStream clientOutputStream = new ObjectOutputStream(clientSocket.getOutputStream());
+                ObjectInputStream clientInputStream = new ObjectInputStream(clientSocket.getInputStream());
                 //TODO: przypisywanie pokoju
-                Client client = new Client(clientSocket);
+                Client client = new Client(clientSocket, clientOutputStream, clientInputStream);
                 clients.add(client);
                 deliverRoomsList(clientOutputStream);
                 Thread thread = new Thread(new ClientService(client));
@@ -70,5 +72,22 @@ public class Server {
             }
         }
     }
+
+    protected static void hungUp(ObjectInputStream reader){
+        Iterator<Client> iterator = clients.iterator();
+        while(iterator.hasNext()){
+            Client client = iterator.next();
+            if (client.getInputStream() == reader){
+                try {
+                    client.getSocket().close();
+                    iterator.remove();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+
 
 }

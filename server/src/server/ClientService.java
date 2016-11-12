@@ -1,6 +1,7 @@
 package server;
 
 import common.MessagePacket;
+import common.UsersPacket;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -8,11 +9,10 @@ import java.util.ArrayList;
 public class ClientService implements Runnable{
 
     private ObjectInputStream reader;
-    private ArrayList<Client> clients;
 
     public ClientService (Client client){
         try{
-            reader = new ObjectInputStream(client.getSocket().getInputStream());
+            reader = client.getInputStream();
         }catch (Exception ex){
             ex.printStackTrace();
         }
@@ -27,16 +27,17 @@ public class ClientService implements Runnable{
         Boolean complete = true;
         while (true) {
             try {
-                if (complete) {
-                    if ((object = reader.readObject()) != null) {
+                if (complete && (object = reader.readObject()) != null) {
+                    if (object instanceof MessagePacket) {
                         MessagePacket messagePacket = (MessagePacket) object;
                         System.out.println("Read message from client: " + messagePacket.getRoom() + ": " + messagePacket.getMessage());
                         Server.sendToAll(messagePacket);
-                        //serialize(messagePacket);
+                        serialize(messagePacket);
                     }
                 }
             }catch (EOFException e){
                 complete = false;
+                Server.hungUp(reader);
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (ClassNotFoundException e) {
