@@ -29,7 +29,7 @@ public class Server {
                 //TODO: przypisywanie pokoju
                 Client client = new Client(clientSocket, clientOutputStream, clientInputStream);
                 clients.add(client);
-                deliverRoomsList(clientOutputStream);
+                deliverToClient(clientOutputStream, chatRoomsList);
                 Thread thread = new Thread(new ClientService(client));
                 thread.start();
             }
@@ -52,16 +52,16 @@ public class Server {
         }
     }
 
-    private void deliverRoomsList(ObjectOutputStream client) {
+    private void deliverToClient(ObjectOutputStream client, Object object) {
         try {
             writer = (ObjectOutputStream) client;
             writer.writeObject(chatRoomsList);
-        }catch (IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    protected static void sendToAll(Object message) {
+    protected void sendToAll(Object message) {
         for (Client client: clients) {
             try{
                 System.out.println("Writing to all: " + message);
@@ -73,7 +73,7 @@ public class Server {
         }
     }
 
-    protected static void hungUp(ObjectInputStream reader){
+    protected void hungUp(ObjectInputStream reader){
         Iterator<Client> iterator = clients.iterator();
         while(iterator.hasNext()){
             Client client = iterator.next();
@@ -84,6 +84,22 @@ public class Server {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+            }
+        }
+    }
+
+    protected void setNickname(String nick, ObjectInputStream reader){
+        Iterator<Client> iterator = clients.iterator();
+        ObjectOutputStream writer = null;
+        while(iterator.hasNext()){
+            Client client = iterator.next();
+            if (client.getInputStream() == reader){
+                writer = client.getOutputStream();
+                if (client.getNickName() != nick)
+                client.setNickName(nick);
+            }else{
+                String error = "Nick jest zajęty!";
+                deliverToClient(writer, error);
             }
         }
     }

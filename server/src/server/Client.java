@@ -32,6 +32,10 @@ public class Client {
         return room;
     }
 
+    public String getNickName() {
+        return nickName;
+    }
+
     public ObjectOutputStream getOutputStream() {
         return outputStream;
     }
@@ -44,4 +48,7 @@ public class Client {
         this.room = room;
     }
 
+    public void setNickName(String nickName) {
+        this.nickName = nickName;
+    }
 }

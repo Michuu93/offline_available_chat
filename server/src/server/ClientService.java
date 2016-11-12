@@ -9,6 +9,7 @@ import java.util.ArrayList;
 public class ClientService implements Runnable{
 
     private ObjectInputStream reader;
+    private Server server = new Server();
 
     public ClientService (Client client){
         try{
@@ -28,16 +29,20 @@ public class ClientService implements Runnable{
         while (true) {
             try {
                 if (complete && (object = reader.readObject()) != null) {
+                    if (object instanceof String){
+                        String nickname =  (String) object;
+                        server.setNickname(nickname, reader);
+                    }
                     if (object instanceof MessagePacket) {
                         MessagePacket messagePacket = (MessagePacket) object;
                         System.out.println("Read message from client: " + messagePacket.getRoom() + ": " + messagePacket.getMessage());
-                        Server.sendToAll(messagePacket);
+                        server.sendToAll(messagePacket);
                         serialize(messagePacket);
                     }
                 }
             }catch (EOFException e){
                 complete = false;
-                Server.hungUp(reader);
+                server.hungUp(reader);
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (ClassNotFoundException e) {
