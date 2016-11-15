@@ -1,10 +1,7 @@
 package server;
 
 import common.MessagePacket;
-import common.UsersPacket;
-
 import java.io.*;
-import java.util.ArrayList;
 
 public class ClientService implements Runnable{
 
@@ -37,7 +34,7 @@ public class ClientService implements Runnable{
                         MessagePacket messagePacket = (MessagePacket) object;
                         System.out.println("Read message from client: " + messagePacket.getRoom() + ": " + messagePacket.getMessage());
                         server.sendToAll(messagePacket);
-                        serialize(messagePacket);
+                        server.serialize(messagePacket);
                     }
                 }
             }catch (EOFException e){
@@ -48,19 +45,6 @@ public class ClientService implements Runnable{
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
             }
-        }
-    }
-
-
-    private void serialize(Object packet){
-        try {
-            FileOutputStream fileOutputStream = null;
-            fileOutputStream = new FileOutputStream("package.ser");
-            ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
-            objectOutputStream.writeObject(packet);
-            objectOutputStream.close();
-        } catch (Exception ex) {
-            ex.printStackTrace();
         }
     }
 

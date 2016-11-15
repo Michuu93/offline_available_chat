@@ -10,12 +10,12 @@ public class Server {
 
     private static ArrayList<Client> clients = new ArrayList<>();
     private ArrayList<String> chatRoomsList = new ArrayList<>();
-    private Socket clientSocket;
     private static ObjectOutputStream writer;
 
     public static void main(String[] args) {
-
-        new Server().connect();
+        Server server = new Server();
+        server.verifyClientList();
+        server.connect();
     }
 
     private void connect() {
@@ -24,8 +24,8 @@ public class Server {
             ServerSocket serverSocket = new ServerSocket(9001);
             while (true) {
                 Socket clientSocket = serverSocket.accept();
-                ObjectOutputStream clientOutputStream = new ObjectOutputStream(clientSocket.getOutputStream());
-                ObjectInputStream clientInputStream = new ObjectInputStream(clientSocket.getInputStream());
+                ObjectOutputStream clientOutputStream = new ObjectOutputStream( new BufferedOutputStream(clientSocket.getOutputStream()));
+                ObjectInputStream clientInputStream = new ObjectInputStream(new BufferedInputStream(clientSocket.getInputStream()));
                 //TODO: przypisywanie pokoju
                 Client client = new Client(clientSocket, clientOutputStream, clientInputStream);
                 clients.add(client);
@@ -104,6 +104,37 @@ public class Server {
         }
     }
 
+    private void verifyClientList(){
+        if (!clients.isEmpty()){
+            deserialize();
+        }
+    }
 
+
+    protected void serialize(Object packet){
+        try {
+            FileOutputStream fileOutputStream = null;
+            fileOutputStream = new FileOutputStream("package.ser");
+            ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
+            objectOutputStream.writeObject(packet);
+            objectOutputStream.close();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    private void deserialize(){
+        try {
+            Object object;
+            ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream("package.ser"));
+            if ((object = inputStream.readObject()) != null){
+                sendToAll(object);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
 
 }
