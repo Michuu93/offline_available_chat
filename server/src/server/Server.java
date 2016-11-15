@@ -32,10 +32,7 @@ public class Server {
                 //TODO: przypisywanie pokoju
 
                 String nickName = getClientNickname(clientInputStream);
-                adminClient(nickName, clientInputStream);
-
-                Client client = new Client(clientSocket, clientOutputStream, clientInputStream);
-                clients.add(client);
+                Client client = verifyClient(nickName, clientInputStream, clientOutputStream);
 
                 Thread thread = new Thread(new ClientService(client));
                 thread.start();
@@ -47,14 +44,19 @@ public class Server {
 
     private String getClientNickname(ObjectInputStream reader) {
         String nick = null;
+        Object object;
         try {
-            while ((nick = String.valueOf(reader.read())) != null) {
-                return nick;
-            }
+                while ((object = reader.readObject()) != null) {
+                    nick = (String) object;
+                    System.out.println("Received nick: " + nick);
+                    return nick;
+                }
+        } catch (ClassNotFoundException e) {
+                e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return nick;
+        return null;
     }
 
     private void loadRooms() {
@@ -108,26 +110,40 @@ public class Server {
         }
     }
 
-    protected void adminClient(String nick, ObjectInputStream reader){
+    private Client addClient(String nick, ObjectInputStream reader, ObjectOutputStream writer){
+        Client client = new Client(nick, reader, writer);
+        clients.add(client);
+        return client;
+    }
+
+    protected Client verifyClient(String nick, ObjectInputStream reader, ObjectOutputStream writer){
+        Client client = null;
         Iterator<Client> iterator = clients.iterator();
-        ObjectOutputStream writer = null;
 
-        while(iterator.hasNext()){
-            Client client = iterator.next();
+        if (clients.isEmpty()){
+            client = addClient(nick, reader, writer);
+            admitClient(writer);
+        }else {
 
-            if (client.getInputStream() == reader){
-                writer = client.getOutputStream();
-
-                if (!Objects.equals(client.getNickName(), nick)){
-                    client.setNickName(nick);
-                    deliverToClient(writer, true);
-                    deliverToClient(writer, chatRoomsList);
+            for (int i = 0; i < clients.size(); i++) {
+                Client current = clients.get(i);
+                if (!Objects.equals(current.getNickName(), nick)) {
+                    client = addClient(nick, reader, writer);
+                    admitClient(writer);
+                } else {
+                    System.out.println("Nick is taken, choose new one.");
+                    deliverToClient(writer, false);
                 }
-
-            }else{
-                deliverToClient(writer, false);
             }
+
         }
+        return client;
+    }
+
+    private void admitClient(ObjectOutputStream writer) {
+        deliverToClient(writer, true);
+        System.out.println("Sending chat rooms list...");
+        deliverToClient(writer, chatRoomsList);
     }
 
     private void verifyClientList(){

@@ -17,8 +17,8 @@ public class Client {
 
     }
 
-    Client(Socket clientSocket, ObjectOutputStream outputStream, ObjectInputStream inputStream){
-        this.socket = clientSocket;
+    Client(String nick, ObjectInputStream inputStream, ObjectOutputStream outputStream){
+        this.nickName = nick;
         this.outputStream = outputStream;
         this.inputStream = inputStream;
         this.room = "Waiting room";
