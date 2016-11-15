@@ -4,7 +4,6 @@ import javafx.application.Platform;
 import common.MessagePacket;
 
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.net.SocketException;
 
 public class ReaderThread implements Runnable {
@@ -12,31 +11,32 @@ public class ReaderThread implements Runnable {
 
     @Override
     public void run() {
-        System.out.println("reader");
         while (true) {
             //Read from server
             try {
                 if (Main.getConnection().isConnected() && ((received = Main.getConnection().getReader().readObject()) != null)) {
                     if (received instanceof MessagePacket) {
-                        System.out.println("Odebrano MessagePacket");
                         MessagePacket msg = (MessagePacket) received;
-                        System.out.println("Odebrano: ID pokoju: " + msg.getRoom() + " Wiadomość: " + msg.getMessage());
-                    } else {
-                        System.out.println("Odebrano coś innego");
+                        System.out.println("Odebrano MessagePacket! Room ID: " + msg.getRoom() + ", Message: " + msg.getMessage());
+                        Main.getMainController().viewMessage(msg);
+                    } else if (received instanceof String){
+                        System.out.println("Odebrano String");
                         System.out.println(received);
+                    } else {
+                        System.out.println("Odebrano coś innego!");
                     }
                 }
             } catch (SocketException e) {
                 //e.printStackTrace();
-                System.out.println("Disconnect!");
+                System.out.println("SocketException - Disconnect!");
                 killThread();
             } catch (IOException e) {
                 //e.printStackTrace();
-                System.out.println("Reader error!");
+                System.out.println("IOException - Reader error! - Disconnect!");
                 killThread();
             } catch (ClassNotFoundException e) {
                 //e.printStackTrace();
-                System.out.println("Reader ClassNotFound!");
+                System.out.println("ClassNotFoundException - Reader ClassNotFound! - Disconnect!");
                 killThread();
             }
         }

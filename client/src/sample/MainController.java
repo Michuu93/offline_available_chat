@@ -25,6 +25,8 @@ public class MainController {
     private ListView roomsListView;
     @FXML
     private TabPane tabPane;
+    @FXML
+    private TextArea waitingRoomTextArea;
 
     @FXML
     public void menuConnect() throws IOException {
@@ -69,7 +71,7 @@ public class MainController {
             connectionStatus.setText("connected");
         } else {
             connectionStatus.setTextFill(Color.RED);
-            //connectionStatus.setText("disconnected");
+            connectionStatus.setText("disconnected");
         }
     }
 
@@ -85,9 +87,8 @@ public class MainController {
     }
 
     @FXML
-    public void onEnter(KeyEvent e){
-        if(e.getCode().toString().equals("ENTER"))
-        {
+    public void onEnter(KeyEvent e) {
+        if (e.getCode().toString().equals("ENTER") && !messageField.getText().isEmpty()) {
             sendClicked();
         }
     }
@@ -115,30 +116,35 @@ public class MainController {
     public void roomClick(MouseEvent click) {
         if (click.getClickCount() == 2) {
             String currentItemSelected = (String) roomsListView.getSelectionModel().getSelectedItem();
-            if ((currentItemSelected != null) && !Main.getJoinedChatRoomsList().contains(currentItemSelected)) {
+            if ((currentItemSelected != null) && !Main.getJoinedChatRoomsTabs().containsKey(currentItemSelected)) {
                 joinRoom(currentItemSelected);
             }
         }
     }
 
-    public void joinRoom (String joinRoom){
+    public void joinRoom(String joinRoom) {
         Tab newTab = new Tab();
         newTab.setText(joinRoom);
-        newTab.setId(joinRoom);
         tabPane.getTabs().add(newTab);
         tabPane.getSelectionModel().select(newTab);
 
-        ScrollPane newScrollPane = new ScrollPane();
-        newScrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
-        newTab.setContent(newScrollPane);
-
         TextArea newTextArea = new TextArea();
         newTextArea.setEditable(false);
-        newTextArea.setMinWidth(586);
-        newTextArea.setMinHeight(416);
-        newScrollPane.setContent(newTextArea);
+        newTextArea.setWrapText(true);
+        newTab.setContent(newTextArea);
 
-        Main.getJoinedChatRoomsList().add(joinRoom);
+        Main.getJoinedChatRoomsTabs().put(joinRoom, newTextArea);
+    }
+
+    public void viewMessage(MessagePacket message) {
+        if (message.getRoom().equalsIgnoreCase("Waiting room")) { //view message in chat room tab
+            waitingRoomTextArea.appendText(message.getMessage() + "\n");
+
+        } else { //view message in other tabs
+            TextArea roomTab = Main.getJoinedChatRoomsTabs().get(message.getRoom());
+            roomTab.appendText(message.getMessage() + "\n");
+        }
+
     }
 
     public void closeTabs() {

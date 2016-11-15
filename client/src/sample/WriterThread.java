@@ -3,7 +3,6 @@ package sample;
 import common.MessagePacket;
 
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 
 public class WriterThread implements Runnable {
 
@@ -11,7 +10,7 @@ public class WriterThread implements Runnable {
             try {
                 Main.getConnection().getWriter().writeObject(message);
                 Main.getConnection().getWriter().flush();
-                System.out.println("Wysłano do pokoju: " + message.getRoom() + "\nwiadomość: " + message.getMessage());
+                System.out.println("\nWysłano MessagePacket! Room ID: " + message.getRoom() + ", Message: " + message.getMessage());
 
                 //zamykanie wątku, nie wiem czy działa
                 Thread.currentThread().interrupt();

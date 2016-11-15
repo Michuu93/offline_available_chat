@@ -29,6 +29,7 @@ public class ClientService implements Runnable{
                     if (object instanceof String){
                         String nickname =  (String) object;
                         server.setNickname(nickname, reader);
+                        System.out.println("Odebrano nick: " + nickname);
                     }
                     if (object instanceof MessagePacket) {
                         MessagePacket messagePacket = (MessagePacket) object;

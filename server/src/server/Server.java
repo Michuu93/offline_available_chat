@@ -25,6 +25,7 @@ public class Server {
             while (true) {
                 Socket clientSocket = serverSocket.accept();
                 ObjectOutputStream clientOutputStream = new ObjectOutputStream( new BufferedOutputStream(clientSocket.getOutputStream()));
+                clientOutputStream.flush();
                 ObjectInputStream clientInputStream = new ObjectInputStream(new BufferedInputStream(clientSocket.getInputStream()));
                 //TODO: przypisywanie pokoju
                 Client client = new Client(clientSocket, clientOutputStream, clientInputStream);
@@ -54,8 +55,9 @@ public class Server {
 
     private void deliverToClient(ObjectOutputStream client, Object object) {
         try {
-            writer = (ObjectOutputStream) client;
-            writer.writeObject(chatRoomsList);
+            writer = client;
+            writer.writeObject(object);
+            writer.flush();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -95,11 +97,15 @@ public class Server {
             Client client = iterator.next();
             if (client.getInputStream() == reader){
                 writer = client.getOutputStream();
-                if (client.getNickName() != nick)
-                client.setNickName(nick);
+                if (client.getNickName() != nick){
+                    client.setNickName(nick);
+                    Boolean nickCheck = true;
+                    deliverToClient(writer, nickCheck);
+                }
+
             }else{
-                String error = "Nick jest zajęty!";
-                deliverToClient(writer, error);
+                Boolean nickCheck = false;
+                deliverToClient(writer, nickCheck);
             }
         }
     }

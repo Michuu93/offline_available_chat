@@ -4,15 +4,17 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.TextArea;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Main extends Application {
     private static Connection connection = new Connection();
     private static String userNick;
     private static ArrayList<String> chatRoomsList = new ArrayList<String>();
-    private static ArrayList<String> joinedChatRoomsList = new ArrayList<String>();
+    private static HashMap<String, TextArea> joinedChatRoomsTabs = new HashMap<>();
     private static MainController mainController;
     private static ConnectController connectController;
 
@@ -20,7 +22,7 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws Exception {
         Parent root = FXMLLoader.load(getClass().getResource("MainScreen.fxml"));
         primaryStage.setTitle("Chat Client");
-        primaryStage.setScene(new Scene(root, 800, 500));
+        primaryStage.setScene(new Scene(root, 790, 490));
         primaryStage.setResizable(false);
         primaryStage.show();
     }
@@ -45,8 +47,8 @@ public class Main extends Application {
         Main.chatRoomsList = chatRoomsList;
     }
 
-    public static ArrayList<String> getJoinedChatRoomsList() {
-        return joinedChatRoomsList;
+    public static HashMap<String, TextArea> getJoinedChatRoomsTabs() {
+        return joinedChatRoomsTabs;
     }
 
     public static MainController getMainController() {

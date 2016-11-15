@@ -12,17 +12,34 @@ public class Connection {
     private Thread readerThread;
     private boolean connected = false;
     private ObjectInputStream reader;
-    ObjectOutputStream writer;
+    private ObjectOutputStream writer;
 
     public void connect(String server, int port) throws IOException, ClassNotFoundException {
         try {
             socket = new Socket(server, port);
-            reader = new ObjectInputStream(socket.getInputStream());
-            writer = new ObjectOutputStream(socket.getOutputStream());
-            System.out.println("Connected to " + server + ":" + port);
-            setConnected(true);
+            writer = new ObjectOutputStream(new BufferedOutputStream(socket.getOutputStream()));
+            writer.flush();
+            reader = new ObjectInputStream(new BufferedInputStream(socket.getInputStream()));
+
+            sendNick();
             getRoomsList();
-            startReaderThread();
+
+            //sprawdzanie nicku
+            Boolean nickCheck;
+            if ((nickCheck = (Boolean) reader.readObject()) != null){
+                System.out.println(nickCheck);
+                if (nickCheck == true){
+                    System.out.println("Connected to " + server + ":" + port);
+                    setConnected(true);
+
+
+                    startReaderThread();
+                } else if (nickCheck == false){
+                    System.out.println("Nick zajęty! Disconnect!");
+                    disconnect();
+                }
+
+            }
         } catch (IOException e) {
             //e.printStackTrace();
             Main.getConnectController().setConnectLabel("Server is not responding!");
@@ -36,14 +53,10 @@ public class Connection {
             socket.close();
             Main.getMainController().clearRoomsList();
             Main.getChatRoomsList().clear();
-            Main.getJoinedChatRoomsList().clear();
+            Main.getJoinedChatRoomsTabs().clear();
             Main.getMainController().closeTabs();
             System.out.println("Disconnect!");
         }
-    }
-
-    public Socket getSocket() {
-        return socket;
     }
 
     public ObjectInputStream getReader() {
@@ -60,7 +73,8 @@ public class Connection {
 
     public void setConnected(boolean connected) {
         this.connected = connected;
-        Platform.runLater(() -> Main.getMainController().setStatus(connected));
+        //Platform.runLater(() -> Main.getMainController().setStatus(connected));
+        Main.getMainController().setStatus(connected);
     }
 
     public void startReaderThread() {
@@ -68,6 +82,12 @@ public class Connection {
         readerThread = new Thread(readerJob);
         readerThread.setName("Reader Thread");
         readerThread.start();
+    }
+
+    public void sendNick() throws IOException {
+        writer.writeObject(Main.getUserNick());
+        writer.flush();
+        System.out.println("Wysłano nick: " + Main.getUserNick());
     }
 
     public void getRoomsList() throws IOException, ClassNotFoundException {
