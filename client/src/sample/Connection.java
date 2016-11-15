@@ -22,22 +22,23 @@ public class Connection {
             reader = new ObjectInputStream(new BufferedInputStream(socket.getInputStream()));
 
             sendNick();
-            getRoomsList();
-
             //sprawdzanie nicku
             Boolean nickCheck;
-            if ((nickCheck = (Boolean) reader.readObject()) != null){
-                System.out.println(nickCheck);
-                if (nickCheck == true){
-                    System.out.println("Connected to " + server + ":" + port);
-                    setConnected(true);
-
-
-                    startReaderThread();
-                } else if (nickCheck == false){
-                    System.out.println("Nick zajęty! Disconnect!");
-                    disconnect();
-                }
+            while (true) {
+                if ((nickCheck = (Boolean) reader.readObject()) != null){
+                    System.out.println("NickCheck: " + nickCheck);
+                    if (nickCheck == true){
+                        System.out.println("Connected to " + server + ":" + port);
+                        setConnected(true);
+                        getRoomsList();
+                        startReaderThread();
+                    } else if (nickCheck == false){
+                        System.out.println("Nick zajęty! Disconnect!");
+                        Main.getConnectController().setConnectLabel("Nick is already in use, please choose another!");
+                        disconnect();
+                    }
+                    break;
+            }
 
             }
         } catch (IOException e) {

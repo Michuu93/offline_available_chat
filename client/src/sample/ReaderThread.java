@@ -1,7 +1,7 @@
 package sample;
 
 import javafx.application.Platform;
-import common.MessagePacket;
+import common.*;
 
 import java.io.IOException;
 import java.net.SocketException;
@@ -19,9 +19,9 @@ public class ReaderThread implements Runnable {
                         MessagePacket msg = (MessagePacket) received;
                         System.out.println("Odebrano MessagePacket! Room ID: " + msg.getRoom() + ", Message: " + msg.getMessage());
                         Main.getMainController().viewMessage(msg);
-                    } else if (received instanceof String){
-                        System.out.println("Odebrano String");
-                        System.out.println(received);
+                    } else if (received instanceof UsersPacket){
+                        UsersPacket msg = (UsersPacket) received;
+                        System.out.println("Odebrano UsersPacket! Room ID: " + msg.getRoom() + ", Users List: " + msg.getClientsList());
                     } else {
                         System.out.println("Odebrano coś innego!");
                     }
