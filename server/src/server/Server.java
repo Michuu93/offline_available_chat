@@ -5,6 +5,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Objects;
 
 public class Server {
 
@@ -24,19 +25,36 @@ public class Server {
             ServerSocket serverSocket = new ServerSocket(9001);
             while (true) {
                 Socket clientSocket = serverSocket.accept();
+
                 ObjectOutputStream clientOutputStream = new ObjectOutputStream( new BufferedOutputStream(clientSocket.getOutputStream()));
                 clientOutputStream.flush();
                 ObjectInputStream clientInputStream = new ObjectInputStream(new BufferedInputStream(clientSocket.getInputStream()));
                 //TODO: przypisywanie pokoju
+
+                String nickName = getClientNickname(clientInputStream);
+                adminClient(nickName, clientInputStream);
+
                 Client client = new Client(clientSocket, clientOutputStream, clientInputStream);
                 clients.add(client);
-                deliverToClient(clientOutputStream, chatRoomsList);
+
                 Thread thread = new Thread(new ClientService(client));
                 thread.start();
             }
         } catch (Exception ex) {
             ex.printStackTrace();
         } 
+    }
+
+    private String getClientNickname(ObjectInputStream reader) {
+        String nick = null;
+        try {
+            while ((nick = String.valueOf(reader.read())) != null) {
+                return nick;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return nick;
     }
 
     private void loadRooms() {
@@ -90,22 +108,24 @@ public class Server {
         }
     }
 
-    protected void setNickname(String nick, ObjectInputStream reader){
+    protected void adminClient(String nick, ObjectInputStream reader){
         Iterator<Client> iterator = clients.iterator();
         ObjectOutputStream writer = null;
+
         while(iterator.hasNext()){
             Client client = iterator.next();
+
             if (client.getInputStream() == reader){
                 writer = client.getOutputStream();
-                if (client.getNickName() != nick){
+
+                if (!Objects.equals(client.getNickName(), nick)){
                     client.setNickName(nick);
-                    Boolean nickCheck = true;
-                    deliverToClient(writer, nickCheck);
+                    deliverToClient(writer, true);
+                    deliverToClient(writer, chatRoomsList);
                 }
 
             }else{
-                Boolean nickCheck = false;
-                deliverToClient(writer, nickCheck);
+                deliverToClient(writer, false);
             }
         }
     }

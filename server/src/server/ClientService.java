@@ -26,11 +26,6 @@ public class ClientService implements Runnable{
         while (true) {
             try {
                 if (complete && (object = reader.readObject()) != null) {
-                    if (object instanceof String){
-                        String nickname =  (String) object;
-                        server.setNickname(nickname, reader);
-                        System.out.println("Odebrano nick: " + nickname);
-                    }
                     if (object instanceof MessagePacket) {
                         MessagePacket messagePacket = (MessagePacket) object;
                         System.out.println("Read message from client: " + messagePacket.getRoom() + ": " + messagePacket.getMessage());
