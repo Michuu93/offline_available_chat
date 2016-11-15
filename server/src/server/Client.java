@@ -2,13 +2,13 @@ package server;
 
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.OutputStream;
 import java.net.Socket;
 
 public class Client {
 
-    private Socket Socket;
+    private Socket socket;
     private String room;
+    private String nickName;
     private ObjectOutputStream outputStream;
     private ObjectInputStream inputStream;
 
@@ -17,19 +17,23 @@ public class Client {
 
     }
 
-    Client(Socket clientSocket){
-        this.Socket = clientSocket;
-        //this.outputStream = outputStream;
-        //this.inputStream = inputStream;
+    Client(Socket clientSocket, ObjectOutputStream outputStream, ObjectInputStream inputStream){
+        this.socket = clientSocket;
+        this.outputStream = outputStream;
+        this.inputStream = inputStream;
         this.room = "Waiting room";
     }
 
     public Socket getSocket() {
-        return Socket;
+        return socket;
     }
 
     public String getRoom() {
         return room;
+    }
+
+    public String getNickName() {
+        return nickName;
     }
 
     public ObjectOutputStream getOutputStream() {
@@ -42,5 +46,9 @@ public class Client {
 
     public void setRoom(String room) {
         this.room = room;
+    }
+
+    public void setNickName(String nickName) {
+        this.nickName = nickName;
     }
 }

@@ -1,18 +1,16 @@
 package server;
 
 import common.MessagePacket;
-
 import java.io.*;
-import java.util.ArrayList;
 
 public class ClientService implements Runnable{
 
     private ObjectInputStream reader;
-    private ArrayList<Client> clients;
+    private Server server = new Server();
 
     public ClientService (Client client){
         try{
-            reader = new ObjectInputStream(client.getSocket().getInputStream());
+            reader = client.getInputStream();
         }catch (Exception ex){
             ex.printStackTrace();
         }
@@ -25,34 +23,28 @@ public class ClientService implements Runnable{
     private void read(){
         Object object;
         Boolean complete = true;
-        while (complete) {
+        while (true) {
             try {
-                if ((object = reader.readObject()) != null) {
-                    MessagePacket messagePacket = (MessagePacket) object;
-                    System.out.println("Read message from client: " + messagePacket.getRoom() + ": " + messagePacket.getMessage());
-                    Server.sendToAll(messagePacket);
-                    //serialize(messagePacket);
+                if (complete && (object = reader.readObject()) != null) {
+                    if (object instanceof String){
+                        String nickname =  (String) object;
+                        server.setNickname(nickname, reader);
+                    }
+                    if (object instanceof MessagePacket) {
+                        MessagePacket messagePacket = (MessagePacket) object;
+                        System.out.println("Read message from client: " + messagePacket.getRoom() + ": " + messagePacket.getMessage());
+                        server.sendToAll(messagePacket);
+                        server.serialize(messagePacket);
+                    }
                 }
             }catch (EOFException e){
                 complete = false;
+                server.hungUp(reader);
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
             }
-        }
-    }
-
-
-    private void serialize(Object packet){
-        try {
-            FileOutputStream fileOutputStream = null;
-            fileOutputStream = new FileOutputStream("package.ser");
-            ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
-            objectOutputStream.writeObject(packet);
-            objectOutputStream.close();
-        } catch (Exception ex) {
-            ex.printStackTrace();
         }
     }
 

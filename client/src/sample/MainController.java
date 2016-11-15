@@ -69,7 +69,7 @@ public class MainController {
             connectionStatus.setText("connected");
         } else {
             connectionStatus.setTextFill(Color.RED);
-            connectionStatus.setText("disconnected");
+            //connectionStatus.setText("disconnected");
         }
     }
 
