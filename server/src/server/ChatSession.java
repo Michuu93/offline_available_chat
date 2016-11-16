@@ -2,19 +2,25 @@ package server;
 
 import common.MessagePacket;
 import java.io.*;
+import java.net.SocketException;
+import java.util.ArrayList;
 
-public class ClientService implements Runnable{
+public class ChatSession implements Runnable{
 
     private ObjectInputStream reader;
-    private Server server = new Server();
+    private Server server;
+    private ArrayList<Client> clients = new ArrayList<>();
 
-    public ClientService (Client client){
+    public ChatSession(Server server, ObjectInputStream reader, ArrayList<Client> clients){
         try{
-            reader = client.getInputStream();
+            this.server = server;
+            this.clients = clients;
+            this.reader = reader;
         }catch (Exception ex){
             ex.printStackTrace();
         }
     }
+
     @Override
     public void run() {
             read();
@@ -27,9 +33,10 @@ public class ClientService implements Runnable{
             try {
                 if (complete && (object = reader.readObject()) != null) {
                     if (object instanceof MessagePacket) {
+                        server.getCurrentDate();
                         MessagePacket messagePacket = (MessagePacket) object;
                         System.out.println("Read message from client: " + messagePacket.getRoom() + ": " + messagePacket.getMessage());
-                        server.sendToAll(messagePacket);
+                        sendToAll(messagePacket);
                         server.serialize(messagePacket);
                     }
                 }
@@ -37,9 +44,31 @@ public class ClientService implements Runnable{
                 complete = false;
                 server.hungUp(reader);
             } catch (IOException e) {
-                e.printStackTrace();
+                server.hungUp(reader);
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
+            }
+        }
+    }
+
+    protected void deliverToClient(ObjectOutputStream client, Object object) {
+        try {
+            ObjectOutputStream writer = client;
+            writer.writeObject(object);
+            writer.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    protected void sendToAll(Object message) {
+        for (Client client: clients) {
+            try{
+                System.out.println("Writing to all: " + message);
+                client.getOutputStream().writeObject(message);
+                client.getOutputStream().flush();
+            }catch(Exception ex){
+                ex.printStackTrace();
             }
         }
     }

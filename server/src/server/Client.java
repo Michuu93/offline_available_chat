@@ -13,11 +13,11 @@ public class Client {
     private ObjectInputStream inputStream;
 
 
-    Client(){
+    public Client(){
 
     }
 
-    Client(String nick, ObjectInputStream inputStream, ObjectOutputStream outputStream){
+    public Client(String nick, ObjectInputStream inputStream, ObjectOutputStream outputStream){
         this.nickName = nick;
         this.outputStream = outputStream;
         this.inputStream = inputStream;
