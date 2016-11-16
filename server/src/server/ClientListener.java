@@ -60,6 +60,7 @@ public class ClientListener {
                 if (!Objects.equals(current.getNickName(), nick)) {
                     client = addClient(nick);
                     admitClient();
+                    break;
                 } else {
                     System.out.println("Nick is taken, choose new one.");
                     chatSession.deliverToClient(writer, false);
