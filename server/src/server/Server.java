@@ -3,15 +3,19 @@ package server;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.Objects;
 
 public class Server {
 
     private static ArrayList<Client> clients = new ArrayList<>();
-    private ArrayList<String> chatRoomsList = new ArrayList<>();
-    private static ObjectOutputStream writer;
+    private static ArrayList<String> chatRoomsList = new ArrayList<>();
+    private static ClientListener clientListener;
+    private ChatSession chatSession;
 
     public static void main(String[] args) {
         Server server = new Server();
@@ -26,37 +30,24 @@ public class Server {
             while (true) {
                 Socket clientSocket = serverSocket.accept();
 
-                ObjectOutputStream clientOutputStream = new ObjectOutputStream( new BufferedOutputStream(clientSocket.getOutputStream()));
+                ObjectOutputStream clientOutputStream = new ObjectOutputStream(new BufferedOutputStream(clientSocket.getOutputStream()));
                 clientOutputStream.flush();
                 ObjectInputStream clientInputStream = new ObjectInputStream(new BufferedInputStream(clientSocket.getInputStream()));
+
                 //TODO: przypisywanie pokoju
 
-                String nickName = getClientNickname(clientInputStream);
-                Client client = verifyClient(nickName, clientInputStream, clientOutputStream);
+                chatSession = new ChatSession(this, clientInputStream, clients);
 
-                Thread thread = new Thread(new ClientService(client));
+                clientListener = new ClientListener(clients, clientInputStream, clientOutputStream, chatSession, chatRoomsList);
+                String nickName = clientListener.getClientNickname();
+                Client client = clientListener.verifyNick(nickName);
+
+                Thread thread = new Thread(chatSession);
                 thread.start();
             }
         } catch (Exception ex) {
             ex.printStackTrace();
-        } 
-    }
-
-    private String getClientNickname(ObjectInputStream reader) {
-        String nick = null;
-        Object object;
-        try {
-                while ((object = reader.readObject()) != null) {
-                    nick = (String) object;
-                    System.out.println("Received nick: " + nick);
-                    return nick;
-                }
-        } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
         }
-        return null;
     }
 
     private void loadRooms() {
@@ -73,35 +64,15 @@ public class Server {
         }
     }
 
-    private void deliverToClient(ObjectOutputStream client, Object object) {
-        try {
-            writer = client;
-            writer.writeObject(object);
-            writer.flush();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
-    protected void sendToAll(Object message) {
-        for (Client client: clients) {
-            try{
-                System.out.println("Writing to all: " + message);
-                writer.writeObject(message);
-                writer.flush();
-            }catch(Exception ex){
-                ex.printStackTrace();
-            }
-        }
-    }
-
-    protected void hungUp(ObjectInputStream reader){
+    protected void hungUp(ObjectInputStream reader) {
         Iterator<Client> iterator = clients.iterator();
-        while(iterator.hasNext()){
+        while (iterator.hasNext()) {
             Client client = iterator.next();
-            if (client.getInputStream() == reader){
+            if (client.getInputStream() == reader) {
                 try {
-                    client.getSocket().close();
+                    System.out.println(client.getNickName() + " is diconnected.");
+                    reader.close();
                     iterator.remove();
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -110,50 +81,13 @@ public class Server {
         }
     }
 
-    private Client addClient(String nick, ObjectInputStream reader, ObjectOutputStream writer){
-        Client client = new Client(nick, reader, writer);
-        clients.add(client);
-        return client;
-    }
-
-    protected Client verifyClient(String nick, ObjectInputStream reader, ObjectOutputStream writer){
-        Client client = null;
-        Iterator<Client> iterator = clients.iterator();
-
-        if (clients.isEmpty()){
-            client = addClient(nick, reader, writer);
-            admitClient(writer);
-        }else {
-
-            for (int i = 0; i < clients.size(); i++) {
-                Client current = clients.get(i);
-                if (!Objects.equals(current.getNickName(), nick)) {
-                    client = addClient(nick, reader, writer);
-                    admitClient(writer);
-                } else {
-                    System.out.println("Nick is taken, choose new one.");
-                    deliverToClient(writer, false);
-                }
-            }
-
-        }
-        return client;
-    }
-
-    private void admitClient(ObjectOutputStream writer) {
-        deliverToClient(writer, true);
-        System.out.println("Sending chat rooms list...");
-        deliverToClient(writer, chatRoomsList);
-    }
-
-    private void verifyClientList(){
-        if (!clients.isEmpty()){
+    private void verifyClientList() {
+        if (!clients.isEmpty()) {
             deserialize();
         }
     }
 
-
-    protected void serialize(Object packet){
+    protected void serialize(Object packet) {
         try {
             FileOutputStream fileOutputStream = null;
             fileOutputStream = new FileOutputStream("package.ser");
@@ -165,18 +99,24 @@ public class Server {
         }
     }
 
-    private void deserialize(){
+    private void deserialize() {
         try {
             Object object;
             ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream("package.ser"));
-            if ((object = inputStream.readObject()) != null){
-                sendToAll(object);
+            if ((object = inputStream.readObject()) != null) {
+                chatSession.sendToAll(object);
             }
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
+    }
+
+    protected String getCurrentDate() {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd kk:mm:ss");
+        String date = dateFormat.format(new Date());
+        return date;
     }
 
 }
