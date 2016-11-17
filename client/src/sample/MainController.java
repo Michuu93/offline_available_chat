@@ -1,6 +1,7 @@
 package sample;
 
 import javafx.collections.FXCollections;
+import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -10,19 +11,22 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import common.MessagePacket;
+import common.*;
 
 import java.io.IOException;
 
 public class MainController {
     private Thread writerThread;
     private static Stage connectStage;
+    private static Boolean tabSwitch = false;
     @FXML
     private Label connectionStatus;
     @FXML
     private TextField messageField;
     @FXML
     private ListView roomsListView;
+    @FXML
+    private ListView usersListView;
     @FXML
     private TabPane tabPane;
     @FXML
@@ -80,10 +84,20 @@ public class MainController {
         roomsListView.setItems(FXCollections.observableList(Main.getChatRoomsList()));
     }
 
+    public void fillUsersList(String room){
+        usersListView.setItems(FXCollections.observableList(Main.getRoomUsersList(room)));
+    }
+
     @FXML
     public void clearRoomsList() {
         roomsListView.getItems().clear();
         roomsListView.refresh();
+    }
+
+    @FXML
+    public void clearUsersList() {
+        usersListView.getItems().clear();
+        usersListView.refresh();
     }
 
     @FXML
@@ -125,6 +139,7 @@ public class MainController {
     public void joinRoom(String joinRoom) {
         Tab newTab = new Tab();
         newTab.setText(joinRoom);
+        newTab.setOnSelectionChanged(event -> changeTab(event));
         tabPane.getTabs().add(newTab);
         tabPane.getSelectionModel().select(newTab);
 
@@ -134,17 +149,37 @@ public class MainController {
         newTab.setContent(newTextArea);
 
         Main.getJoinedChatRoomsTabs().put(joinRoom, newTextArea);
+
+        //send join to server
+        RoomPacket roomPacket = new RoomPacket(joinRoom, RoomPacket.Join.JOIN);
+        Runnable writerJob = new WriterThread(roomPacket);
+        writerThread = new Thread(writerJob);
+        writerThread.setName("Writer Thread");
+        writerThread.start();
+    }
+
+    public void changeTab(Event e) {
+        if (Main.getConnection().isConnected()) {
+            if (!tabSwitch) {
+                tabSwitch = true;
+            } else {
+                Tab tabSchwitched = (Tab) e.getSource();
+                clearUsersList();
+                fillUsersList(tabSchwitched.getText());
+                tabSwitch = false;
+                System.out.println("Tab switched to: " + tabSchwitched.getText());
+            }
+        }
     }
 
     public void viewMessage(MessagePacket message) {
         if (message.getRoom().equalsIgnoreCase("Waiting room")) { //view message in chat room tab
-            waitingRoomTextArea.appendText(message.getMessage() + "\n");
+            waitingRoomTextArea.appendText(message.getDate() + " [" + message.getNick() + "]: " + message.getMessage() + "\n");
 
         } else { //view message in other tabs
             TextArea roomTab = Main.getJoinedChatRoomsTabs().get(message.getRoom());
-            roomTab.appendText(message.getMessage() + "\n");
+            roomTab.appendText(message.getDate() + " [" + message.getNick() + "]: " + message.getMessage() + "\n");
         }
-
     }
 
     public void closeTabs() {

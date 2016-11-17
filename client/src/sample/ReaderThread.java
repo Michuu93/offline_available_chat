@@ -17,13 +17,14 @@ public class ReaderThread implements Runnable {
                 if (Main.getConnection().isConnected() && ((received = Main.getConnection().getReader().readObject()) != null)) {
                     if (received instanceof MessagePacket) {
                         MessagePacket msg = (MessagePacket) received;
-                        System.out.println("Odebrano MessagePacket! Room ID: " + msg.getRoom() + ", Message: " + msg.getMessage());
+                        System.out.println("Received MessagePacket! Room ID: " + msg.getRoom() + ", Message: " + msg.getMessage());
                         Main.getMainController().viewMessage(msg);
                     } else if (received instanceof UsersPacket){
-                        UsersPacket msg = (UsersPacket) received;
-                        System.out.println("Odebrano UsersPacket! Room ID: " + msg.getRoom() + ", Users List: " + msg.getClientsList());
+                        UsersPacket roomUsers = (UsersPacket) received;
+                        Main.setRoomUsersList(roomUsers.getRoom(), roomUsers.getClientsList());
+                        System.out.println("Received UsersPacket! Room ID: " + roomUsers.getRoom() + ", Users List: " + roomUsers.getClientsList());
                     } else {
-                        System.out.println("Odebrano coś innego!");
+                        System.out.println("Received something else!");
                     }
                 }
             } catch (SocketException e) {

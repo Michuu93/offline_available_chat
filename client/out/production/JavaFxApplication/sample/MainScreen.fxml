@@ -34,7 +34,7 @@
     <Button layoutX="522.0" layoutY="473.0" mnemonicParsing="false" onAction="#sendClicked" prefWidth="76.0" text="Send" />
     <TabPane fx:id="tabPane" layoutY="27.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="444.0" prefWidth="600.0" tabClosingPolicy="UNAVAILABLE">
         <tabs>
-            <Tab text="Waiting room">
+            <Tab onSelectionChanged="#changeTab" text="Waiting room">
             <content>
                <TextArea fx:id="waitingRoomTextArea" editable="false" wrapText="true" />
             </content></Tab>
@@ -46,10 +46,10 @@
       </content></ScrollPane>
     <ScrollPane hbarPolicy="NEVER" layoutX="600.0" layoutY="271.0" prefHeight="200.0" prefWidth="200.0" vbarPolicy="ALWAYS">
       <content>
-         <TextArea editable="false" prefHeight="200.0" prefWidth="200.0" />
+         <ListView fx:id="usersListView" prefHeight="200.0" prefWidth="200.0" />
       </content></ScrollPane>
     <Label layoutX="604.0" layoutY="39.0" text="Rooms:" />
-    <Label layoutX="604.0" layoutY="255.0" text="Users:" />
+    <Label layoutX="604.0" layoutY="255.0" text="Users in room:" />
     <Label layoutX="604.0" layoutY="477.0" text="Connect status:" />
     <Label fx:id="connectionStatus" layoutX="690.0" layoutY="477.0" text="disconnected" textFill="RED" />
 </Pane>

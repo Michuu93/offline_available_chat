@@ -3,7 +3,6 @@ package common;
 import java.util.ArrayList;
 
 public class UsersPacket {
-
     private String room;
     private ArrayList<String> clientsList =  new ArrayList<String>();
 

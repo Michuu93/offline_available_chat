@@ -114,7 +114,7 @@ public class Server {
     }
 
     protected String getCurrentDate() {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd kk:mm:ss");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
         String date = dateFormat.format(new Date());
         return date;
     }
