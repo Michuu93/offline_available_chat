@@ -35,7 +35,8 @@ public class ChatSession implements Runnable{
                     if (object instanceof MessagePacket) {
                         server.getCurrentDate();
                         MessagePacket messagePacket = (MessagePacket) object;
-                        System.out.println("Read message from client: " + messagePacket.getRoom() + ": " + messagePacket.getMessage());
+                        messagePacket.setDate(server.getCurrentDate());
+                        System.out.println(messagePacket.getDate() + ": Read message from client: " + messagePacket.getRoom() + ": " + messagePacket.getMessage());
                         sendToAll(messagePacket);
                         server.serialize(messagePacket);
                     }
