@@ -1,32 +1,37 @@
 package server;
 
 import common.MessagePacket;
-import java.io.*;
-import java.net.SocketException;
-import java.util.ArrayList;
+import common.RoomPacket;
 
-public class ChatSession implements Runnable{
+import java.io.EOFException;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.HashMap;
+import java.util.Map;
+
+public class ChatSession implements Runnable {
 
     private ObjectInputStream reader;
     private Server server;
-    private ArrayList<Client> clients = new ArrayList<>();
+    private Map<String, Client> clients = new HashMap<>();
 
-    public ChatSession(Server server, ObjectInputStream reader, ArrayList<Client> clients){
-        try{
+    public ChatSession(Server server, ObjectInputStream reader, Map<String, Client> clients) {
+        try {
             this.server = server;
             this.clients = clients;
             this.reader = reader;
-        }catch (Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
 
     @Override
     public void run() {
-            read();
+        read();
     }
 
-    private void read(){
+    private void read() {
         Object object;
         Boolean complete = true;
         while (true) {
@@ -37,11 +42,20 @@ public class ChatSession implements Runnable{
                         MessagePacket messagePacket = (MessagePacket) object;
                         messagePacket.setDate(server.getCurrentDate());
                         System.out.println(messagePacket.getDate() + ": Read message from client: " + messagePacket.getRoom() + ": " + messagePacket.getMessage());
-                        sendToAll(messagePacket);
+                        String room = messagePacket.getRoom();
+                        if (room == server.getChatRoomsList().get(0))
+                            sendToAll(messagePacket);
+                        else
+                            sendToUsersInRoom(room, messagePacket);
                         server.serialize(messagePacket);
                     }
+                    if (object instanceof RoomPacket) {
+                        RoomPacket roomPacket = (RoomPacket) object;
+                        System.out.println("Received roompacket" + roomPacket.getRoom());
+                        alterList(roomPacket.getRoom(), roomPacket.getNick(), (RoomPacket.Join) roomPacket.getJoin());
+                    }
                 }
-            }catch (EOFException e){
+            } catch (EOFException e) {
                 complete = false;
                 server.hungUp(reader);
             } catch (IOException e) {
@@ -63,15 +77,39 @@ public class ChatSession implements Runnable{
     }
 
     protected void sendToAll(Object message) {
-        for (Client client: clients) {
-            try{
-                System.out.println("Writing to all: " + message);
-                client.getOutputStream().writeObject(message);
-                client.getOutputStream().flush();
-            }catch(Exception ex){
+        System.out.println("Writing to all: " + message);
+        for (Map.Entry<String, Client> client : clients.entrySet()) {
+            try {
+                client.getValue().getOutputStream().writeObject(message);
+                client.getValue().getOutputStream().flush();
+            } catch (Exception ex) {
                 ex.printStackTrace();
             }
         }
     }
+
+    private void sendToUsersInRoom(String room, Object message) {
+        System.out.println("Writing to users in room: " + room);
+        try {
+            for (Client client : server.getUsersInRoomsMap().get(room)) {
+                client.getOutputStream().writeObject(message);
+                client.getOutputStream().flush();
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    private void alterList(String room, String nick, RoomPacket.Join flag) {
+
+        if (flag == RoomPacket.Join.JOIN) {
+            System.out.println(nick + " joined to the " + room);
+            server.getUsersInRoomsMap().get(room).add(clients.get(nick));
+        } else {
+            System.out.println(nick + " unjoined from the " + room);
+            server.getUsersInRoomsMap().get(room).remove(clients.get(nick));
+        }
+    }
+
 
 }
