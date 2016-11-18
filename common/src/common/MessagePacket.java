@@ -8,9 +8,10 @@ public class MessagePacket implements Serializable {
     private String date;
     private String nick;
 
-    public MessagePacket(){}
+    public MessagePacket() {
+    }
 
-    public MessagePacket(String message, String room){
+    public MessagePacket(String message, String room) {
         this.message = message;
         this.room = room;
     }

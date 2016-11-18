@@ -33,7 +33,7 @@ public class Server {
 
                 //TODO: przypisywanie pokoju
 
-                chatSession = new ChatSession(this, clientInputStream, clients);
+                chatSession = new ChatSession(this, clientInputStream, clients, usersInRoomsMap);
 
                 clientListener = new ClientListener(clients, clientInputStream, clientOutputStream, chatSession);
                 String nickName = clientListener.getClientNickname();
@@ -123,10 +123,6 @@ public class Server {
 
     public ArrayList<String> getChatRoomsList() {
         return chatRoomsNamesList;
-    }
-
-    public Map<String, List<Client>> getUsersInRoomsMap() {
-        return usersInRoomsMap;
     }
 
 

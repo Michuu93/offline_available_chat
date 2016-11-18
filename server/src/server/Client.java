@@ -7,6 +7,7 @@ import java.net.Socket;
 public class Client {
 
     private String room;
+    private String nick;
     private ObjectOutputStream outputStream;
     private ObjectInputStream inputStream;
 
@@ -36,5 +37,13 @@ public class Client {
 
     public void setRoom(String room) {
         this.room = room;
+    }
+
+    public String getNick() {
+        return nick;
+    }
+
+    public void setNick(String nick) {
+        this.nick = nick;
     }
 }

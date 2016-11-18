@@ -1,6 +1,8 @@
 package common;
 
-public class RoomPacket {
+import java.io.Serializable;
+
+public class RoomPacket implements Serializable {
     private String room;
     private Join join;
     private String nick;
@@ -10,9 +12,10 @@ public class RoomPacket {
     }
 
 
-    public RoomPacket(){}
+    public RoomPacket() {
+    }
 
-    public RoomPacket(String room, Join join){
+    public RoomPacket(String room, Join join) {
         this.room = room;
         this.join = join;
     }

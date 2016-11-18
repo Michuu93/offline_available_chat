@@ -1,17 +1,19 @@
 package common;
 
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 
-public class UsersPacket {
+public class UsersPacket implements Serializable {
     private String room;
-    private ArrayList<String> clientsList =  new ArrayList<String>();
+    private List<String> clientsList = new ArrayList<String>();
 
-    public UsersPacket(String room, ArrayList<String> clientsList) {
+    public UsersPacket(String room, List<String> clientsList) {
         this.room = room;
         this.clientsList = clientsList;
     }
 
-    public UsersPacket(){
+    public UsersPacket() {
 
     }
 
@@ -23,7 +25,7 @@ public class UsersPacket {
         this.room = room;
     }
 
-    public ArrayList<String> getClientsList() {
+    public List<String> getClientsList() {
         return clientsList;
     }
 
