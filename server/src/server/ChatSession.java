@@ -105,9 +105,11 @@ public class ChatSession implements Runnable {
         if (flag == RoomPacket.Join.JOIN) {
             System.out.println(nick + " joined to the " + room);
             server.getUsersInRoomsMap().get(room).add(clients.get(nick));
+            sendToUsersInRoom(room, server.getUsersInRoomsMap().get(room));
         } else {
             System.out.println(nick + " unjoined from the " + room);
             server.getUsersInRoomsMap().get(room).remove(clients.get(nick));
+            sendToUsersInRoom(room, server.getUsersInRoomsMap().get(room));
         }
     }
 
