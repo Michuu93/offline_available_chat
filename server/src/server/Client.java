@@ -6,34 +6,24 @@ import java.net.Socket;
 
 public class Client {
 
-    private Socket socket;
     private String room;
-    private String nickName;
     private ObjectOutputStream outputStream;
     private ObjectInputStream inputStream;
 
 
-    public Client(){
+    public Client() {
 
     }
 
-    public Client(String nick, ObjectInputStream inputStream, ObjectOutputStream outputStream){
-        this.nickName = nick;
+    public Client(ObjectInputStream inputStream, ObjectOutputStream outputStream) {
         this.outputStream = outputStream;
         this.inputStream = inputStream;
         this.room = "Waiting room";
     }
 
-    public Socket getSocket() {
-        return socket;
-    }
 
     public String getRoom() {
         return room;
-    }
-
-    public String getNickName() {
-        return nickName;
     }
 
     public ObjectOutputStream getOutputStream() {
@@ -46,9 +36,5 @@ public class Client {
 
     public void setRoom(String room) {
         this.room = room;
-    }
-
-    public void setNickName(String nickName) {
-        this.nickName = nickName;
     }
 }

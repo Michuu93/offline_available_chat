@@ -3,24 +3,20 @@ package server;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Objects;
+import java.util.*;
 
 public class ClientListener {
 
-    private ArrayList<Client> clients = new ArrayList<>();
+    private static Map<String, Client> clients = new HashMap<>();
     private ObjectInputStream reader;
     private ObjectOutputStream writer;
     private ChatSession chatSession;
-    private static ArrayList<String> chatRoomsList = new ArrayList<>();
 
-    public ClientListener(ArrayList<Client> clients, ObjectInputStream reader, ObjectOutputStream writer, ChatSession chatSession, ArrayList<String> chatRoomsList){
+    public ClientListener(Map<String, Client> clients, ObjectInputStream reader, ObjectOutputStream writer, ChatSession chatSession){
         this.clients = clients;
         this.reader = reader;
         this.writer = writer;
         this.chatSession = chatSession;
-        this.chatRoomsList = chatRoomsList;
     }
 
     protected String getClientNickname() {
@@ -41,30 +37,26 @@ public class ClientListener {
     }
 
     protected Client addClient(String nick){
-        Client client = new Client(nick, reader, writer);
-        clients.add(client);
+        Client client = new Client(reader, writer);
+        clients.put(nick, client);
         return client;
     }
 
     protected Client verifyNick(String nick){
         Client client = null;
-        Iterator<Client> iterator = clients.iterator();
 
         if (clients.isEmpty()){
             client = addClient(nick);
             admitClient();
+
         }else{
 
-            for (int i = 0; i < clients.size(); i++) {
-                Client current = clients.get(i);
-                if (!Objects.equals(current.getNickName(), nick)) {
-                    client = addClient(nick);
-                    admitClient();
-                    break;
-                } else {
-                    System.out.println("Nick is taken, choose new one.");
-                    chatSession.deliverToClient(writer, false);
-                }
+            if (clients.containsKey(nick)){
+                System.out.println("Nick is taken, choose new one.");
+                chatSession.deliverToClient(writer, false);
+            }else{
+                client = addClient(nick);
+                admitClient();
             }
         }
         return client;
@@ -73,6 +65,6 @@ public class ClientListener {
     protected void admitClient() {
         chatSession.deliverToClient(writer, true);
         System.out.println("Sending chat rooms list...");
-        chatSession.deliverToClient(writer, chatRoomsList);
+        chatSession.deliverToClient(writer, new Server().getChatRoomsList());
     }
 }

@@ -3,19 +3,16 @@ package server;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.Objects;
+import java.util.*;
 
 public class Server {
 
-    private static ArrayList<Client> clients = new ArrayList<>();
-    private static ArrayList<String> chatRoomsList = new ArrayList<>();
     private static ClientListener clientListener;
     private ChatSession chatSession;
+    private static Map<String, Client> clients = new HashMap<>();
+    private static ArrayList<String> chatRoomsNamesList = new ArrayList<>();
+    private Map<String, List<Client>> usersInRoomsMap = new HashMap<>();
 
     public static void main(String[] args) {
         Server server = new Server();
@@ -38,7 +35,7 @@ public class Server {
 
                 chatSession = new ChatSession(this, clientInputStream, clients);
 
-                clientListener = new ClientListener(clients, clientInputStream, clientOutputStream, chatSession, chatRoomsList);
+                clientListener = new ClientListener(clients, clientInputStream, clientOutputStream, chatSession);
                 String nickName = clientListener.getClientNickname();
                 Client client = clientListener.verifyNick(nickName);
 
@@ -57,21 +54,26 @@ public class Server {
             BufferedReader reader = new BufferedReader(new FileReader(file));
             String line = null;
             while ((line = reader.readLine()) != null) {
-                chatRoomsList.add(line);
+                chatRoomsNamesList.add(line);
+                createRoomsList(line);
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
+    private void createRoomsList(String line) {
+        usersInRoomsMap.put(line, new ArrayList<Client>());
+    }
+
 
     protected void hungUp(ObjectInputStream reader) {
-        Iterator<Client> iterator = clients.iterator();
+        Iterator iterator = clients.entrySet().iterator();
         while (iterator.hasNext()) {
-            Client client = iterator.next();
-            if (client.getInputStream() == reader) {
+            Map.Entry<String, Client> client = (Map.Entry) iterator.next();
+            if (reader == client.getValue().getInputStream()) {
                 try {
-                    System.out.println(client.getNickName() + " is diconnected.");
+                    System.out.println(client.getKey() + " is diconnected.");
                     reader.close();
                     iterator.remove();
                 } catch (IOException e) {
@@ -118,5 +120,14 @@ public class Server {
         String date = dateFormat.format(new Date());
         return date;
     }
+
+    public ArrayList<String> getChatRoomsList() {
+        return chatRoomsNamesList;
+    }
+
+    public Map<String, List<Client>> getUsersInRoomsMap() {
+        return usersInRoomsMap;
+    }
+
 
 }
