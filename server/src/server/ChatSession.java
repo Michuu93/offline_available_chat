@@ -10,6 +10,7 @@ import java.io.ObjectOutputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class ChatSession implements Runnable {
 
@@ -17,7 +18,6 @@ public class ChatSession implements Runnable {
     private Server server;
     private Map<String, Client> clients = new HashMap<>();
     private Map<String, List<Client>> usersInRooms = new HashMap<>();
-    private Map<String, List<String>>  nicksInRooms = new HashMap<>();
 
     public ChatSession(Server server, ObjectInputStream reader, Map<String, Client> clients, Map<String, List<Client>> usersInRooms) {
         try {
@@ -108,35 +108,23 @@ public class ChatSession implements Runnable {
     }
 
     private void alterMap(String room, String nick, RoomPacket.Join flag) {
+        clients.get(nick).setNick(nick);
 
         if (flag == RoomPacket.Join.JOIN) {
-            System.out.println(nick + " joined to the " + room);
-            //clients.get(nick).setNick(nick);
-            //addToNicksList(room);
 
+            System.out.println(nick + " joined to the " + room);
             usersInRooms.get(room).add(clients.get(nick));
+
 
         } else {
 
             System.out.println(nick + " unjoined from the " + room);
             usersInRooms.get(room).remove(clients.get(nick));
-            sendToUsersInRoom(room, usersInRooms.get(room));
-            //deleteFromNicksList(room);
-        }
-    }
 
-    private void addToNicksList(String room) {
-        for (Client client : usersInRooms.get(room)) {
-           // nicks.add(client.getNick());
         }
-        //sendToUsersInRoom(room, nicks);
-    }
 
-    private void deleteFromNicksList(String room) {
-        for (Client client : usersInRooms.get(room)) {
-           // nicks.remove(client.getNick());
-        }
-       // sendToUsersInRoom(room, nicks);
+        List<String> nicksList = usersInRooms.get(room).stream().map(Client::getNick).collect(Collectors.toList());
+        sendToUsersInRoom(room, nicksList);
     }
 
 
