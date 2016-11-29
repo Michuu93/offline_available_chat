@@ -1,8 +1,11 @@
 package common;
 
-import java.io.Serializable;
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 
-public class MessagePacket implements Serializable {
+public class MessagePacket implements Externalizable {
     private String message;
     private String room;
     private String date;
@@ -53,5 +56,21 @@ public class MessagePacket implements Serializable {
 
     public void setNick(String nick) {
         this.nick = nick;
+    }
+
+    @Override
+    public void writeExternal(ObjectOutput out) throws IOException {
+        out.writeUTF(message);
+        out.writeUTF(nick);
+        out.writeUTF(room);
+        out.writeUTF(date);
+    }
+
+    @Override
+    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+        this.message = in.readUTF();
+        this.nick = in.readUTF();
+        this.room = in.readUTF();
+        this.date = in.readUTF();
     }
 }

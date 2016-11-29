@@ -1,5 +1,7 @@
 package server;
 
+import common.MessagePacket;
+
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -16,17 +18,23 @@ public class Server {
 
     public static void main(String[] args) {
         Server server = new Server();
+        server.test();
         server.verifyClientList();
         server.connect();
+    }
+
+    private void test(){
+        MessagePacket messagePacket = new MessagePacket("nick", "room", "wiadomosc", "29.11");
+        serialize(messagePacket);
     }
 
     private void connect() {
         loadRooms();
         try {
+
             ServerSocket serverSocket = new ServerSocket(9001);
             while (true) {
                 Socket clientSocket = serverSocket.accept();
-
                 ObjectOutputStream clientOutputStream = new ObjectOutputStream(new BufferedOutputStream(clientSocket.getOutputStream()));
                 clientOutputStream.flush();
                 ObjectInputStream clientInputStream = new ObjectInputStream(new BufferedInputStream(clientSocket.getInputStream()));
