@@ -41,19 +41,9 @@ public class ChatSession implements Runnable {
         while (true) {
             try {
                 if (complete && (object = reader.readObject()) != null) {
+
                     if (object instanceof MessagePacket) {
-                        server.getCurrentDate();
-
-                        MessagePacket messagePacket = (MessagePacket) object;
-                        messagePacket.setDate(server.getCurrentDate());
-                        System.out.println(messagePacket.getDate() + ": Read message from client: " + messagePacket.getRoom() + ": " + messagePacket.getMessage());
-                        String room = messagePacket.getRoom();
-
-                        if (room == server.getChatRoomsList().get(0))
-                            sendToAll(messagePacket);
-                        else
-                            sendToUsersInRoom(room, messagePacket);
-                        server.serialize(messagePacket);
+                        readMessage(object);
                     }
 
                     if (object instanceof RoomPacket) {
@@ -61,6 +51,7 @@ public class ChatSession implements Runnable {
                         System.out.println("Received roompacket" + roomPacket.getRoom());
                         alterMap(roomPacket.getRoom(), roomPacket.getNick(), (RoomPacket.Join) roomPacket.getJoin());
                     }
+
                 }
             } catch (EOFException e) {
                 complete = false;
@@ -70,6 +61,26 @@ public class ChatSession implements Runnable {
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
             }
+
+        }
+    }
+
+    private void readMessage(Object object) {
+        synchronized (this) {
+
+            server.getCurrentDate();
+            MessagePacket messagePacket = (MessagePacket) object;
+            messagePacket.setDate(server.getCurrentDate());
+
+            System.out.println(messagePacket.getDate() + ": Read message from client: " + messagePacket.getRoom() + ": " + messagePacket.getMessage());
+
+            String room = messagePacket.getRoom();
+            if (room == server.getChatRoomsList().get(0))
+                sendToAll(messagePacket);
+            else
+                sendToUsersInRoom(room, messagePacket);
+
+            server.serialize(messagePacket);
         }
     }
 
@@ -126,6 +137,5 @@ public class ChatSession implements Runnable {
         List<String> nicksList = usersInRooms.get(room).stream().map(Client::getNick).collect(Collectors.toList());
         sendToUsersInRoom(room, nicksList);
     }
-
 
 }
