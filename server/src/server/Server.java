@@ -14,18 +14,26 @@ public class Server {
     private ChatSession chatSession;
     private static Map<String, Client> clients = new HashMap<>();
     private static ArrayList<String> chatRoomsNamesList = new ArrayList<>();
-    private Map<String, List<Client>> usersInRoomsMap = new HashMap<>();
+    private Map<String, List<Client>> usersInRoom = new HashMap<>();
+    private Map<String, FileOutputStream> roomLog = new HashMap<>();
 
     public static void main(String[] args) {
         Server server = new Server();
-        server.test();
         server.verifyClientList();
         server.connect();
     }
 
-    private void test(){
-        MessagePacket messagePacket = new MessagePacket("nick", "room", "wiadomosc", "29.11");
-        serialize(messagePacket);
+
+    protected void serialize(Object packet) {
+        try {
+            FileOutputStream fileOutputStream = null;
+            fileOutputStream = new FileOutputStream("package.ser");
+            ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
+            objectOutputStream.writeObject(packet);
+            objectOutputStream.close();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
     private void connect() {
@@ -41,7 +49,7 @@ public class Server {
 
                 //TODO: przypisywanie pokoju
 
-                chatSession = new ChatSession(this, clientInputStream, clients, usersInRoomsMap);
+                chatSession = new ChatSession(this, clientInputStream, clients, usersInRoom);
 
                 clientListener = new ClientListener(clients, clientInputStream, clientOutputStream, chatSession);
                 String nickName = clientListener.getClientNickname();
@@ -64,6 +72,7 @@ public class Server {
             while ((line = reader.readLine()) != null) {
                 chatRoomsNamesList.add(line);
                 createRoomsList(line);
+                initializeLogFile(line);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -71,7 +80,24 @@ public class Server {
     }
 
     private void createRoomsList(String line) {
-        usersInRoomsMap.put(line, new ArrayList<Client>());
+        usersInRoom.put(line, new ArrayList<Client>());
+    }
+
+    private void initializeLogFile(String line) {
+        roomLog.clear();
+
+        try {
+            String filename = line + ".ser";
+            FileOutputStream file = null;
+            file = new FileOutputStream(filename);
+            roomLog.put(line, file);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        for (Map.Entry entry : roomLog.entrySet()) {
+            System.out.println(entry.getKey() + ", " + entry.getValue());
+        }
     }
 
 
@@ -97,10 +123,9 @@ public class Server {
         }
     }
 
-    protected void serialize(Object packet) {
+    protected void serialize(String room, Object packet) {
         try {
-            FileOutputStream fileOutputStream = null;
-            fileOutputStream = new FileOutputStream("package.ser");
+            FileOutputStream fileOutputStream = roomLog.get(room);
             ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
             objectOutputStream.writeObject(packet);
             objectOutputStream.close();

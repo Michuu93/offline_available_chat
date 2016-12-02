@@ -10,13 +10,14 @@ import javafx.stage.Stage;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 public class Main extends Application {
     private static Connection connection = new Connection();
     private static String userNick;
     private static ArrayList<String> chatRoomsList = new ArrayList<String>();
     private static HashMap<String, TextArea> joinedChatRoomsTabs = new HashMap<>();
-    private static HashMap<String, ArrayList> roomUsersList = new HashMap<>();
+    private static HashMap<String, List<String>> roomUsersList = new HashMap<>();
     private static MainController mainController;
     private static ConnectController connectController;
 
@@ -69,7 +70,7 @@ public class Main extends Application {
         Main.connectController = connectController;
     }
 
-    public static ArrayList getRoomUsersList(String room) {
+    public static List getRoomUsersList(String room) {
         if (Main.roomUsersList.containsKey(room)) return Main.roomUsersList.get(room);
         else {
             ArrayList<String> x = new ArrayList<>(Arrays.asList("xyz", "abc"));
@@ -77,7 +78,7 @@ public class Main extends Application {
         }
     }
 
-    public static void setRoomUsersList(String room, ArrayList roomUsers) {
+    public static void setRoomUsersList(String room, List<String> roomUsers) {
         Main.roomUsersList.replace(room, roomUsers);
     }
 

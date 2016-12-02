@@ -1,7 +1,8 @@
 package sample;
 
+import common.MessagePacket;
+import common.UsersPacket;
 import javafx.application.Platform;
-import common.*;
 
 import java.io.IOException;
 import java.net.SocketException;
@@ -19,7 +20,7 @@ public class ReaderThread implements Runnable {
                         MessagePacket msg = (MessagePacket) received;
                         System.out.println("Received MessagePacket! Room ID: " + msg.getRoom() + ", Message: " + msg.getMessage());
                         Main.getMainController().viewMessage(msg);
-                    } else if (received instanceof UsersPacket){
+                    } else if (received instanceof UsersPacket) {
                         UsersPacket roomUsers = (UsersPacket) received;
                         Main.setRoomUsersList(roomUsers.getRoom(), roomUsers.getClientsList());
                         System.out.println("Received UsersPacket! Room ID: " + roomUsers.getRoom() + ", Users List: " + roomUsers.getClientsList());

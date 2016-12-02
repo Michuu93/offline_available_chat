@@ -79,8 +79,7 @@ public class ChatSession implements Runnable {
                 sendToAll(messagePacket);
             else
                 sendToUsersInRoom(room, messagePacket);
-
-            server.serialize(messagePacket);
+            //server.serialize(room, messagePacket);
         }
     }
 

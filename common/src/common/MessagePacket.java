@@ -61,9 +61,9 @@ public class MessagePacket implements Externalizable {
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         out.writeUTF(message);
-        out.writeUTF(nick);
+        if (nick != null) out.writeUTF(nick);
         out.writeUTF(room);
-        out.writeUTF(date);
+        if (date != null) out.writeUTF(date);
     }
 
     @Override
