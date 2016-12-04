@@ -1,22 +1,28 @@
 package server;
 
+import common.UsersPacket;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static server.ChatRoom.chatRoomsList;
+import static server.ChatSession.LOUNGE;
 
 public class ClientListener {
 
-    private static Map<String, Client> clients = new HashMap<>();
+    protected static Map<String, Client> clients = new HashMap<>();
     private ObjectInputStream reader;
     private ObjectOutputStream writer;
-    private ChatSession chatSession;
+    private Sender sender = new Sender();
 
-    public ClientListener(Map<String, Client> clients, ObjectInputStream reader, ObjectOutputStream writer, ChatSession chatSession){
-        this.clients = clients;
+    public ClientListener(ObjectInputStream reader, ObjectOutputStream writer) {
         this.reader = reader;
         this.writer = writer;
-        this.chatSession = chatSession;
     }
 
     protected String getClientNickname() {
@@ -36,35 +42,46 @@ public class ClientListener {
         return null;
     }
 
-    protected Client addClient(String nick){
+    protected Client addClient(String nick) {
         Client client = new Client(reader, writer);
         clients.put(nick, client);
         return client;
     }
 
-    protected Client verifyNick(String nick){
-        Client client = null;
-
-        if (clients.isEmpty()){
-            client = addClient(nick);
+    protected boolean verifyNick(String nick) {
+        if (clients.isEmpty()) {
+            addClient(nick);
             admitClient();
 
-        }else{
+        } else {
 
-            if (clients.containsKey(nick)){
+            if (clients.containsKey(nick)) {
                 System.out.println("Nick is taken, choose new one.");
-                chatSession.deliverToClient(writer, false);
-            }else{
-                client = addClient(nick);
+                sender.sendToClient(writer, false);
+                return false;
+            } else {
+                addClient(nick);
                 admitClient();
             }
         }
-        return client;
+        return true;
     }
 
     protected void admitClient() {
-        chatSession.deliverToClient(writer, true);
+        sender.sendToClient(writer, true);
+        deliverRoomList();
+        deliverUserList();
+    }
+
+    private void deliverUserList() {
+        System.out.println("Sending users list...");
+        List<String> usersList = new ArrayList<String>(clients.keySet());
+        UsersPacket roomPacket = new UsersPacket(LOUNGE, usersList);
+        sender.sendToAll(roomPacket);
+    }
+
+    private void deliverRoomList() {
         System.out.println("Sending chat rooms list...");
-        chatSession.deliverToClient(writer, new Server().getChatRoomsList());
+        sender.sendToClient(writer, chatRoomsList);
     }
 }
