@@ -73,13 +73,22 @@ public class Main extends Application {
     public static List getRoomUsersList(String room) {
         if (Main.roomUsersList.containsKey(room)) return Main.roomUsersList.get(room);
         else {
-            ArrayList<String> x = new ArrayList<>(Arrays.asList("xyz", "abc"));
-            return x;
+            System.out.println("List not exist! - " + room);
+            return null;
         }
     }
 
     public static void setRoomUsersList(String room, List<String> roomUsers) {
-        Main.roomUsersList.replace(room, roomUsers);
+        if (roomUsersList.containsKey(room)) Main.roomUsersList.replace(room, roomUsers);
+        else Main.roomUsersList.put(room, roomUsers);
+    }
+
+    public static void clearRoomUsersList(){
+        roomUsersList.clear();
+    }
+
+    public static void removeRoomUsersList(String room){
+        roomUsersList.remove(room);
     }
 
     public static void main(String[] args) {

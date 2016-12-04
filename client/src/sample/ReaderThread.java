@@ -6,6 +6,7 @@ import javafx.application.Platform;
 
 import java.io.IOException;
 import java.net.SocketException;
+import java.util.List;
 
 public class ReaderThread implements Runnable {
     private Object received;
@@ -24,7 +25,9 @@ public class ReaderThread implements Runnable {
                         UsersPacket roomUsers = (UsersPacket) received;
                         Main.setRoomUsersList(roomUsers.getRoom(), roomUsers.getClientsList());
                         System.out.println("Received UsersPacket! Room ID: " + roomUsers.getRoom() + ", Users List: " + roomUsers.getClientsList());
-                    } else {
+                        Platform.runLater(() -> Main.getMainController().fillUsersList(roomUsers.getRoom()));
+                    }
+                    else {
                         System.out.println("Received something else!");
                     }
                 }
@@ -33,7 +36,7 @@ public class ReaderThread implements Runnable {
                 System.out.println("SocketException - Disconnect!");
                 killThread();
             } catch (IOException e) {
-                //e.printStackTrace();
+                e.printStackTrace();
                 System.out.println("IOException - Reader error! - Disconnect!");
                 killThread();
             } catch (ClassNotFoundException e) {

@@ -1,7 +1,5 @@
 package sample;
 
-import javafx.application.Platform;
-
 import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -24,22 +22,18 @@ public class Connection {
             sendNick();
             //sprawdzanie nicku
             Boolean nickCheck;
-            while (true) {
-                if ((nickCheck = (Boolean) reader.readObject()) != null){
-                    System.out.println("NickCheck: " + nickCheck);
-                    if (nickCheck == true){
-                        System.out.println("Connected to " + server + ":" + port);
-                        setConnected(true);
-                        getRoomsList();
-                        startReaderThread();
-                    } else if (nickCheck == false){
-                        System.out.println("Nick zajęty! Disconnect!");
-                        Main.getConnectController().setConnectLabel("Nick is already in use, please choose another!");
-                        disconnect();
-                    }
-                    break;
-            }
-
+            if ((nickCheck = (Boolean) reader.readObject()) != null) {
+                System.out.println("NickCheck: " + nickCheck);
+                if (nickCheck == true) {
+                    System.out.println("Connected to " + server + ":" + port);
+                    setConnected(true);
+                    getRoomsList();
+                    startReaderThread();
+                } else if (nickCheck == false) {
+                    System.out.println("Nick zajęty! Disconnect!");
+                    Main.getConnectController().setConnectLabel("Nick is already in use, please choose another!");
+                    disconnect();
+                }
             }
         } catch (IOException e) {
             //e.printStackTrace();
@@ -56,6 +50,8 @@ public class Connection {
             Main.getChatRoomsList().clear();
             Main.getJoinedChatRoomsTabs().clear();
             Main.getMainController().closeTabs();
+            Main.getMainController().clearUsersList();
+            Main.clearRoomUsersList();
             System.out.println("Disconnect!");
         }
     }
@@ -74,7 +70,6 @@ public class Connection {
 
     public void setConnected(boolean connected) {
         this.connected = connected;
-        //Platform.runLater(() -> Main.getMainController().setStatus(connected));
         Main.getMainController().setStatus(connected);
     }
 
@@ -95,5 +90,4 @@ public class Connection {
         Main.setChatRoomsList((ArrayList<String>) reader.readObject());
         Main.getMainController().fillRoomsList();
     }
-
 }

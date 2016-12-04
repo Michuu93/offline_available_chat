@@ -11,7 +11,7 @@ public class RoomPacket implements Externalizable {
     private String nick;
 
     public enum Join {
-        JOIN, UJNOIN
+        JOIN, UNJOIN
     }
 
 

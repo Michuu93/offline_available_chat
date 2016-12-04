@@ -14,9 +14,9 @@ import javafx.stage.Stage;
 import common.*;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class MainController {
-    private Thread writerThread;
     private static Stage connectStage;
     private static Boolean tabSwitch = false;
     @FXML
@@ -84,8 +84,13 @@ public class MainController {
         roomsListView.setItems(FXCollections.observableList(Main.getChatRoomsList()));
     }
 
-    public void fillUsersList(String room){
-        usersListView.setItems(FXCollections.observableList(Main.getRoomUsersList(room)));
+    public void fillUsersList(String room) {
+        if (Main.getRoomUsersList(room) != null)
+            usersListView.setItems(FXCollections.observableList(Main.getRoomUsersList(room)));
+        else {
+            usersListView.getItems().clear();
+            usersListView.refresh();
+        }
     }
 
     @FXML
@@ -112,13 +117,8 @@ public class MainController {
         if (Main.getConnection().isConnected()) {
             String roomID = tabPane.getSelectionModel().getSelectedItem().getText();
             String message = messageField.getText();
-            MessagePacket msgPacket = new MessagePacket();
-            msgPacket.setMessage(message);
-            msgPacket.setRoom(roomID);
-            Runnable writerJob = new WriterThread(msgPacket);
-            writerThread = new Thread(writerJob);
-            writerThread.setName("Writer Thread");
-            writerThread.start();
+            MessagePacket msgPacket = new MessagePacket(message, roomID);
+            Writer.writeMessagePacket(msgPacket);
             messageField.clear();
         } else {
             System.out.println("Nie można wysłać wiadomośći, nie jesteś połączony!");
@@ -140,6 +140,7 @@ public class MainController {
         Tab newTab = new Tab();
         newTab.setText(joinRoom);
         newTab.setOnSelectionChanged(event -> changeTab(event));
+        newTab.setOnClosed(event -> leaveRoom(event));
         tabPane.getTabs().add(newTab);
         tabPane.getSelectionModel().select(newTab);
 
@@ -152,10 +153,20 @@ public class MainController {
 
         //send join to server
         RoomPacket roomPacket = new RoomPacket(joinRoom, RoomPacket.Join.JOIN);
-        Runnable writerJob = new WriterThread(roomPacket);
-        writerThread = new Thread(writerJob);
-        writerThread.setName("Writer Thread");
-        writerThread.start();
+        Writer.writeRoomPacket(roomPacket);
+    }
+
+    public void leaveRoom(Event e) {
+        Tab closedTab = (Tab) e.getSource();
+        String closedTabName = closedTab.getText();
+        System.out.println("Leaving room " + closedTabName);
+
+        Main.getJoinedChatRoomsTabs().remove(closedTabName);
+        Main.removeRoomUsersList(closedTabName);
+
+        //send unjoin to server
+        RoomPacket roomPacket = new RoomPacket(closedTabName, RoomPacket.Join.UNJOIN);
+        Writer.writeRoomPacket(roomPacket);
     }
 
     public void changeTab(Event e) {
@@ -164,7 +175,7 @@ public class MainController {
                 tabSwitch = true;
             } else {
                 Tab tabSchwitched = (Tab) e.getSource();
-                clearUsersList();
+                //clearUsersList();
                 fillUsersList(tabSchwitched.getText());
                 tabSwitch = false;
                 System.out.println("Tab switched to: " + tabSchwitched.getText());

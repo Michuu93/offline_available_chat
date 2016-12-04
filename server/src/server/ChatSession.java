@@ -2,6 +2,7 @@ package server;
 
 import common.MessagePacket;
 import common.RoomPacket;
+import common.UsersPacket;
 
 import java.io.EOFException;
 import java.io.IOException;
@@ -48,10 +49,12 @@ public class ChatSession implements Runnable {
 
                     if (object instanceof RoomPacket) {
                         RoomPacket roomPacket = (RoomPacket) object;
-                        System.out.println("Received roompacket" + roomPacket.getRoom());
+                        System.out.println("Received roompacket " + roomPacket.getRoom());
                         alterMap(roomPacket.getRoom(), roomPacket.getNick(), (RoomPacket.Join) roomPacket.getJoin());
                     }
-
+                    else {
+                        System.out.println("Odebrano coś innego - " + object);
+                    }
                 }
             } catch (EOFException e) {
                 complete = false;
@@ -133,8 +136,10 @@ public class ChatSession implements Runnable {
 
         }
 
+        //tymczasowo zrobilem prowizorke, jak cos to wysylaj room packet
         List<String> nicksList = usersInRooms.get(room).stream().map(Client::getNick).collect(Collectors.toList());
-        sendToUsersInRoom(room, nicksList);
+        UsersPacket usersInRoom = new UsersPacket(room, nicksList);
+        sendToUsersInRoom(room, usersInRoom);
     }
 
 }
