@@ -8,7 +8,6 @@ public class Writer {
 
     public static void writeMessagePacket(MessagePacket messagePacket) {
         try {
-            messagePacket.setNick(Main.getUserNick()); //adding user nick to packet
             Main.getConnection().getWriter().writeObject(messagePacket);
             Main.getConnection().getWriter().flush();
             System.out.println("Wysłano MessagePacket! Room ID: " + messagePacket.getRoom() + ", Message: " + messagePacket.getMessage());

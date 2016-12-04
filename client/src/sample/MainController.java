@@ -1,5 +1,6 @@
 package sample;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.event.Event;
 import javafx.fxml.FXML;
@@ -30,7 +31,7 @@ public class MainController {
     @FXML
     private TabPane tabPane;
     @FXML
-    private TextArea waitingRoomTextArea;
+    private ListView waitingRoomListView;
 
     @FXML
     public void menuConnect() throws IOException {
@@ -117,7 +118,8 @@ public class MainController {
         if (Main.getConnection().isConnected()) {
             String roomID = tabPane.getSelectionModel().getSelectedItem().getText();
             String message = messageField.getText();
-            MessagePacket msgPacket = new MessagePacket(message, roomID);
+
+            MessagePacket msgPacket = new MessagePacket(message, roomID, Main.getUserNick());
             Writer.writeMessagePacket(msgPacket);
             messageField.clear();
         } else {
@@ -144,12 +146,10 @@ public class MainController {
         tabPane.getTabs().add(newTab);
         tabPane.getSelectionModel().select(newTab);
 
-        TextArea newTextArea = new TextArea();
-        newTextArea.setEditable(false);
-        newTextArea.setWrapText(true);
-        newTab.setContent(newTextArea);
+        ListView newListView = new ListView();
+        newTab.setContent(newListView);
 
-        Main.getJoinedChatRoomsTabs().put(joinRoom, newTextArea);
+        Main.getJoinedChatRoomsTabs().put(joinRoom, newListView);
 
         //send join to server
         RoomPacket roomPacket = new RoomPacket(joinRoom, RoomPacket.Join.JOIN);
@@ -174,22 +174,24 @@ public class MainController {
             if (!tabSwitch) {
                 tabSwitch = true;
             } else {
-                Tab tabSchwitched = (Tab) e.getSource();
+                Tab tabSwitched = (Tab) e.getSource();
                 //clearUsersList();
-                fillUsersList(tabSchwitched.getText());
+                fillUsersList(tabSwitched.getText());
                 tabSwitch = false;
-                System.out.println("Tab switched to: " + tabSchwitched.getText());
+                System.out.println("Tab switched to: " + tabSwitched.getText());
             }
         }
     }
 
     public void viewMessage(MessagePacket message) {
         if (message.getRoom().equalsIgnoreCase("Waiting room")) { //view message in chat room tab
-            waitingRoomTextArea.appendText(message.getDate() + " [" + message.getNick() + "]: " + message.getMessage() + "\n");
+            waitingRoomListView.getItems().add(message.getDate() + " [" + message.getNick() + "]: " + message.getMessage() + "\n");
+            waitingRoomListView.scrollTo(waitingRoomListView.getItems().size()-1);
 
         } else { //view message in other tabs
-            TextArea roomTab = Main.getJoinedChatRoomsTabs().get(message.getRoom());
-            roomTab.appendText(message.getDate() + " [" + message.getNick() + "]: " + message.getMessage() + "\n");
+            ListView roomTab = Main.getJoinedChatRoomsTabs().get(message.getRoom());
+            roomTab.getItems().add(message.getDate() + " [" + message.getNick() + "]: " + message.getMessage() + "\n");
+            roomTab.scrollTo(roomTab.getItems().size()-1);
         }
     }
 

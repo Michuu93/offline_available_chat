@@ -47,7 +47,7 @@ public class ChatSession implements Runnable {
                         readMessage(object);
                     }
 
-                    if (object instanceof RoomPacket) {
+                    else if (object instanceof RoomPacket) {
                         RoomPacket roomPacket = (RoomPacket) object;
                         System.out.println("Received roompacket " + roomPacket.getRoom());
                         alterMap(roomPacket.getRoom(), roomPacket.getNick(), (RoomPacket.Join) roomPacket.getJoin());

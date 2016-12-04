@@ -20,7 +20,7 @@ public class ReaderThread implements Runnable {
                     if (received instanceof MessagePacket) {
                         MessagePacket msg = (MessagePacket) received;
                         System.out.println("Received MessagePacket! Room ID: " + msg.getRoom() + ", Message: " + msg.getMessage());
-                        Main.getMainController().viewMessage(msg);
+                        Platform.runLater( () -> Main.getMainController().viewMessage(msg));
                     } else if (received instanceof UsersPacket) {
                         UsersPacket roomUsers = (UsersPacket) received;
                         Main.setRoomUsersList(roomUsers.getRoom(), roomUsers.getClientsList());

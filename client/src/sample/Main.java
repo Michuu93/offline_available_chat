@@ -4,6 +4,7 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import javafx.stage.Stage;
 
@@ -16,7 +17,7 @@ public class Main extends Application {
     private static Connection connection = new Connection();
     private static String userNick;
     private static ArrayList<String> chatRoomsList = new ArrayList<String>();
-    private static HashMap<String, TextArea> joinedChatRoomsTabs = new HashMap<>();
+    private static HashMap<String, ListView> joinedChatRoomsTabs = new HashMap<>();
     private static HashMap<String, List<String>> roomUsersList = new HashMap<>();
     private static MainController mainController;
     private static ConnectController connectController;
@@ -50,7 +51,7 @@ public class Main extends Application {
         Main.chatRoomsList = chatRoomsList;
     }
 
-    public static HashMap<String, TextArea> getJoinedChatRoomsTabs() {
+    public static HashMap<String, ListView> getJoinedChatRoomsTabs() {
         return joinedChatRoomsTabs;
     }
 

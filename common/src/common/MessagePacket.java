@@ -1,9 +1,6 @@
 package common;
 
-import java.io.Externalizable;
-import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectOutput;
+import java.io.*;
 
 public class MessagePacket implements Externalizable {
     private String message;
@@ -17,12 +14,20 @@ public class MessagePacket implements Externalizable {
     public MessagePacket(String message, String room) {
         this.message = message;
         this.room = room;
+        this.date = null;
     }
 
     public MessagePacket(String message, String room, String date, String nick) {
         this.message = message;
         this.room = room;
         this.date = date;
+        this.nick = nick;
+    }
+
+    public MessagePacket(String message, String room, String nick) {
+        this.message = message;
+        this.room = room;
+        this.date = " ";
         this.nick = nick;
     }
 
@@ -61,9 +66,11 @@ public class MessagePacket implements Externalizable {
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         out.writeUTF(message);
-        if (nick != null) out.writeUTF(nick);
+        //if (nick != null)
+        out.writeUTF(nick);
         out.writeUTF(room);
-        if (date != null) out.writeUTF(date);
+        //if (date != null)
+        out.writeUTF(date);
     }
 
     @Override
@@ -73,4 +80,5 @@ public class MessagePacket implements Externalizable {
         this.room = in.readUTF();
         this.date = in.readUTF();
     }
+
 }
