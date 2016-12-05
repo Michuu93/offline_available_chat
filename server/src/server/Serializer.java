@@ -1,23 +1,18 @@
 package server;
 
 import java.io.*;
-import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+
+import static server.ChatRoom.roomsLog;
 
 /**
  * Created by Niki on 2016-12-04.
  */
 public class Serializer {
 
-    private Map<String, FileOutputStream> roomsLog;
-
-    public Serializer(){}
-
-    public Serializer( Map<String, FileOutputStream> roomsLog){
-        this.roomsLog = roomsLog;
-    }
-
     protected void serialize(String room, Object packet) {
+
         try {
             FileOutputStream fileOutputStream = roomsLog.get(room);
             ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
@@ -29,16 +24,22 @@ public class Serializer {
     }
 
     protected void deserialize() {
-        try {
-            Object object;
-            ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream("package.ser"));
-            if ((object = inputStream.readObject()) != null) {
-                new Sender().sendToAll(object);
+
+        Iterator iterator = roomsLog.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry log = (Map.Entry)iterator.next();
+            String room = (String) log.getKey();
+            try {
+                Object object;
+                ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(room + ".ser"));
+                if ((object = inputStream.readObject()) != null) {
+                    new Sender().sendToUsersInRoom(room, object);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
         }
     }
 

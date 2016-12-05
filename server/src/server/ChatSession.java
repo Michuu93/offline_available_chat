@@ -73,13 +73,16 @@ public class ChatSession implements Runnable {
             server.getCurrentDate();
             messagePacket.setDate(server.getCurrentDate());
 
+            Serializer serializer = new Serializer();
             String room = messagePacket.getRoom();
-            if (room.equals(LOUNGE))
-                sender.sendToAll(messagePacket);
-            else
-                sender.sendToUsersInRoom(room, messagePacket);
-               // new Serializer(chatRoom.getRoomsLog()).serialize(room, messagePacket);
 
+            if (room.equals(LOUNGE)){
+                sender.sendToAll(messagePacket);
+                serializer.serialize(LOUNGE, messagePacket);
+            } else {
+                sender.sendToUsersInRoom(room, messagePacket);
+                new Serializer().serialize(room, messagePacket);
+            }
             System.out.println(messagePacket.getDate() + ": Read message from client from " + room + ": " + messagePacket.getMessage());
         }
     }

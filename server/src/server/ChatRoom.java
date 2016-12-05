@@ -10,13 +10,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static server.ChatSession.LOUNGE;
 import static server.ClientListener.clients;
 
 
 public class ChatRoom {
 
     protected static ArrayList<String> chatRoomsList = new ArrayList<>();
-    private Map<String, FileOutputStream> roomsLog = new HashMap<>();
+    protected static Map<String, FileOutputStream> roomsLog = new HashMap<>();
     protected static Map<String, List<Client>> usersInRoom = new HashMap<>();
 
     protected void loadRooms() {
@@ -30,6 +31,7 @@ public class ChatRoom {
                 createRoomsList(line);
                 initializeLogFile(line);
             }
+            initializeLogFile(LOUNGE);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -41,7 +43,7 @@ public class ChatRoom {
         try {
             String filename = line + ".ser";
             FileOutputStream file = null;
-            file = new FileOutputStream(filename);
+            file = new FileOutputStream(filename, true);
             roomsLog.put(line, file);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
