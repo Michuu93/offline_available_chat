@@ -29,6 +29,9 @@ public class ChatSession implements Runnable {
         read();
     }
 
+    /**
+     * Reading function, that identify packets received from clients.
+     */
     private void read() {
         Object object;
         Boolean complete = true;
@@ -55,13 +58,20 @@ public class ChatSession implements Runnable {
 
         }
     }
-
+    /**
+     * Refer action to Chat Room, after received Room Packet with client;'s proper flag.
+     * @param object room packet with flag
+     */
     private void updateListing(RoomPacket object) {
         RoomPacket roomPacket = object;
         System.out.println("Received roompacket " + roomPacket.getRoom());
         chatRoom.alterUsersMap(roomPacket.getRoom(), roomPacket.getNick(), (RoomPacket.Join) roomPacket.getJoin());
     }
 
+    /**
+     * Function responsible for reading messages from clients.
+     * @param messagePacket- message received from client
+     */
     private void readMessage(MessagePacket messagePacket) {
         synchronized (this) {
 
@@ -73,10 +83,10 @@ public class ChatSession implements Runnable {
 
             if (room.equals(LOUNGE)) {
                 sender.sendToAll(messagePacket);
-                serializer.serialize(LOUNGE, messagePacket);
+                //serializer.serialize(LOUNGE, messagePacket);
             } else {
                 sender.sendToUsersInRoom(room, messagePacket);
-                new Serializer().serialize(room, messagePacket);
+                //serializer.serialize(room, messagePacket);
             }
             System.out.println(messagePacket.getDate() + ": Read message from client from " + room + ": " + messagePacket.getMessage());
         }

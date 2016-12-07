@@ -2,29 +2,39 @@ package server;
 
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.Socket;
 
 public class Client {
 
-    private String room;
+    /**
+     * Client's nickname
+     */
     private String nick;
+    /**
+     * Client's output stream to write.
+     */
     private ObjectOutputStream outputStream;
+    /**
+     * Client's input stream to read.
+     */
     private ObjectInputStream inputStream;
 
 
+    /**
+     * Default constructor.
+     */
     public Client() {
 
     }
 
+    /**
+     * Constructor with clients input
+     *
+     * @param inputStream
+     * @param outputStream
+     */
     public Client(ObjectInputStream inputStream, ObjectOutputStream outputStream) {
         this.outputStream = outputStream;
         this.inputStream = inputStream;
-        this.room = "Waiting room";
-    }
-
-
-    public String getRoom() {
-        return room;
     }
 
     public ObjectOutputStream getOutputStream() {
@@ -33,10 +43,6 @@ public class Client {
 
     public ObjectInputStream getInputStream() {
         return inputStream;
-    }
-
-    public void setRoom(String room) {
-        this.room = room;
     }
 
     public String getNick() {

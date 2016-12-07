@@ -1,6 +1,7 @@
 package sample;
 
-import javafx.application.Platform;
+import common.MessagePacket;
+import common.RoomPacket;
 import javafx.collections.FXCollections;
 import javafx.event.Event;
 import javafx.fxml.FXML;
@@ -12,10 +13,8 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import common.*;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
 public class MainController {
     private static Stage connectStage;
@@ -186,12 +185,12 @@ public class MainController {
     public void viewMessage(MessagePacket message) {
         if (message.getRoom().equalsIgnoreCase("Waiting room")) { //view message in chat room tab
             waitingRoomListView.getItems().add(message.getDate() + " [" + message.getNick() + "]: " + message.getMessage() + "\n");
-            waitingRoomListView.scrollTo(waitingRoomListView.getItems().size()-1);
+            waitingRoomListView.scrollTo(waitingRoomListView.getItems().size() - 1);
 
         } else { //view message in other tabs
             ListView roomTab = Main.getJoinedChatRoomsTabs().get(message.getRoom());
             roomTab.getItems().add(message.getDate() + " [" + message.getNick() + "]: " + message.getMessage() + "\n");
-            roomTab.scrollTo(roomTab.getItems().size()-1);
+            roomTab.scrollTo(roomTab.getItems().size() - 1);
         }
     }
 
