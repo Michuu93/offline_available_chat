@@ -29,4 +29,4 @@ java -jar client/out/artifacts/client.jar
 
 (or if system supports – double click jar file)
 
-[server javadoc] <https://sszadi.github.io/>
+[server javadoc]: <https://sszadi.github.io/>
