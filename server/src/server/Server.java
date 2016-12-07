@@ -4,9 +4,18 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.Map;
 
 import static server.ClientListener.clients;
+
+/**
+ * @author Sylwia Üçüncü, Michał Hoja
+ * @version 1.0
+ * @since 2016.11.05
+ * Main class responsible for initialisation of server work and create connect with clients.
+ */
 
 public class Server {
 
@@ -18,6 +27,9 @@ public class Server {
         new Server().connect();
     }
 
+    /**
+     * This method starts communication between a client program and a server program.
+     */
     private void connect() {
         try {
             ServerSocket serverSocket = new ServerSocket(9001);
@@ -40,6 +52,12 @@ public class Server {
         }
     }
 
+    /**
+     * Hung up method, which removes client from clients list and close the stream between client and server.
+     * The reader argument is client that connection is interrupted.
+     *
+     * @param reader
+     */
     protected void hungUp(ObjectInputStream reader) {
         Iterator iterator = clients.entrySet().iterator();
         while (iterator.hasNext()) {
@@ -59,16 +77,24 @@ public class Server {
         }
     }
 
+    /**
+     *
+     */
     private void verifyClientList() {
         if (!clients.isEmpty()) {
             new Serializer().deserialize();
         }
     }
 
-    protected String getCurrentDate() {
+    /**
+     * Returns current time
+     *
+     * @return current time
+     */
+    protected String getCurrentTime() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
-        String date = dateFormat.format(new Date());
-        return date;
+        String time = dateFormat.format(new Date());
+        return time;
     }
 
 

@@ -16,10 +16,22 @@ import static server.ClientListener.clients;
 
 public class ChatRoom {
 
+    /**
+     * List of chat rooms names.
+     */
     protected static ArrayList<String> chatRoomsList = new ArrayList<>();
+    /**
+     * Map with set of keys- chat rooms names and values- file stream to store rooms log.
+     */
     protected static Map<String, FileOutputStream> roomsLog = new HashMap<>();
+    /**
+     * Stores clients list of each room.
+     */
     protected static Map<String, List<Client>> usersInRoom = new HashMap<>();
 
+    /**
+     * Loads room to chat rooms list from txt file.
+     */
     protected void loadRooms() {
         String filename = "src\\chatRooms.txt";
         try {
@@ -28,7 +40,7 @@ public class ChatRoom {
             String line = null;
             while ((line = reader.readLine()) != null) {
                 chatRoomsList.add(line);
-                createRoomsList(line);
+                createUsersList(line);
                 initializeLogFile(line);
             }
             initializeLogFile(LOUNGE);
@@ -37,6 +49,11 @@ public class ChatRoom {
         }
     }
 
+    /**
+     * Creates file for each chat room and puts it to rooms log map.
+     * The line argument is name of a chat room.
+     * @param line
+     */
     private void initializeLogFile(String line) {
         roomsLog.clear();
 
@@ -48,13 +65,16 @@ public class ChatRoom {
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-
-        for (Map.Entry entry : roomsLog.entrySet()) {
-            System.out.println(entry.getKey() + ", " + entry.getValue());
-        }
     }
 
 
+    /**
+     * Is responsible for adding and removing clients from chat rooms list based on flag from RoomPacket received from client.
+     * The room argument is name of chat room, that client want to join or leave.
+     * @param room
+     * @param nick
+     * @param flag
+     */
     protected void alterUsersMap(String room, String nick, RoomPacket.Join flag) {
         Client newUser = clients.get(nick);
 
@@ -76,16 +96,22 @@ public class ChatRoom {
         generateNickList(room);
     }
 
+    /**
+     * Generates clients nicks list for chat room that is send to clients in room.
+     * The room argument is name of chat room.
+     * @param room
+     */
     private void generateNickList(String room) {
         UsersPacket usersPacket = new UsersPacket(room, usersInRoom.get(room).stream().map(Client::getNick).collect(Collectors.toList()));
         new Sender().sendToUsersInRoom(room, usersPacket);
     }
 
-    private void createRoomsList(String line) {
+    /**
+     * Initializes list of clients for chat room, specified by line argument- chat room name.
+     * @param line
+     */
+    private void createUsersList(String line) {
         usersInRoom.put(line, new ArrayList<Client>());
     }
 
-    public Map<String, FileOutputStream> getRoomsLog() {
-        return roomsLog;
-    }
 }

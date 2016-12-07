@@ -10,13 +10,12 @@ import java.io.ObjectInputStream;
 public class ChatSession implements Runnable {
 
     private ObjectInputStream reader;
-    private Server server= new Server();
+    private Server server = new Server();
     private ChatRoom chatRoom = new ChatRoom();
     private Sender sender = new Sender();
 
     protected static final String LOUNGE = "Waiting room";
 
-    public ChatSession(){}
 
     public ChatSession(ObjectInputStream reader) {
         try {
@@ -40,12 +39,9 @@ public class ChatSession implements Runnable {
 
                     if (object instanceof MessagePacket) {
                         readMessage((MessagePacket) object);
-                    }
-
-                    else if (object instanceof RoomPacket) {
+                    } else if (object instanceof RoomPacket) {
                         updateListing((RoomPacket) object);
-                    }
-                    else {
+                    } else {
                         System.out.println("Sth else - " + object);
                     }
                 }
@@ -70,13 +66,13 @@ public class ChatSession implements Runnable {
     private void readMessage(MessagePacket messagePacket) {
         synchronized (this) {
 
-            server.getCurrentDate();
-            messagePacket.setDate(server.getCurrentDate());
+            server.getCurrentTime();
+            messagePacket.setDate(server.getCurrentTime());
 
             Serializer serializer = new Serializer();
             String room = messagePacket.getRoom();
 
-            if (room.equals(LOUNGE)){
+            if (room.equals(LOUNGE)) {
                 sender.sendToAll(messagePacket);
                 serializer.serialize(LOUNGE, messagePacket);
             } else {
