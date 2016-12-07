@@ -4,6 +4,11 @@
 Multithreaded client/server chat.
 
 
+### Documentation
+
+Please read [server javadoc], [client javadoc].
+
+
 ### Installation
 
 - Get current release
@@ -23,3 +28,5 @@ java -jar client/out/artifacts/client.jar
 ```
 
 (or if system supports – double click jar file)
+
+[server javadoc]: <https://sszadi.github.io/>

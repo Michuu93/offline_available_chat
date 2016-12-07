@@ -52,7 +52,7 @@ public class ChatRoom {
     /**
      * Creates file for each chat room and puts it to rooms log map.
      * The line argument is name of a chat room.
-     * @param line
+     * @param line- chat room name
      */
     private void initializeLogFile(String line) {
         roomsLog.clear();
@@ -71,9 +71,9 @@ public class ChatRoom {
     /**
      * Is responsible for adding and removing clients from chat rooms list based on flag from RoomPacket received from client.
      * The room argument is name of chat room, that client want to join or leave.
-     * @param room
-     * @param nick
-     * @param flag
+     * @param room- chat room name
+     * @param nick- client's nick
+     * @param flag- join/unjoin flag
      */
     protected void alterUsersMap(String room, String nick, RoomPacket.Join flag) {
         Client newUser = clients.get(nick);
@@ -99,7 +99,7 @@ public class ChatRoom {
     /**
      * Generates clients nicks list for chat room that is send to clients in room.
      * The room argument is name of chat room.
-     * @param room
+     * @param room- name of chat room
      */
     private void generateNickList(String room) {
         UsersPacket usersPacket = new UsersPacket(room, usersInRoom.get(room).stream().map(Client::getNick).collect(Collectors.toList()));
@@ -108,10 +108,10 @@ public class ChatRoom {
 
     /**
      * Initializes list of clients for chat room, specified by line argument- chat room name.
-     * @param line
+     * @param room- name of chat room
      */
-    private void createUsersList(String line) {
-        usersInRoom.put(line, new ArrayList<Client>());
+    private void createUsersList(String room) {
+        usersInRoom.put(room, new ArrayList<Client>());
     }
 
 }

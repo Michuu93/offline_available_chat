@@ -15,8 +15,7 @@ public class ChatSession implements Runnable {
     private Sender sender = new Sender();
 
     protected static final String LOUNGE = "Waiting room";
-
-
+    
     public ChatSession(ObjectInputStream reader) {
         try {
             this.reader = reader;
