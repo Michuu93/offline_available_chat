@@ -6,11 +6,14 @@ import java.util.Map;
 
 import static server.ChatRoom.roomsLog;
 
-/**
- * Created by Niki on 2016-12-04.
- */
+
 public class Serializer {
 
+    /**
+     * Serialiaze objects to given room log file.
+     * @param room chat room name
+     * @param packet message
+     */
     protected void serialize(String room, Object packet) {
 
         try {

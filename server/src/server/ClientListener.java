@@ -13,18 +13,36 @@ import java.util.Map;
 import static server.ChatRoom.chatRoomsList;
 import static server.ChatSession.LOUNGE;
 
+/**
+ * Responsible for adding new client to the chat.
+ */
+
 public class ClientListener {
 
+    /**
+     * Stores set of nick keys with clients that respond to them.
+     */
     protected static Map<String, Client> clients = new HashMap<>();
     private ObjectInputStream reader;
     private ObjectOutputStream writer;
     private Sender sender = new Sender();
 
+    /**
+     * Constructor with with the given clients input stream and output stream.
+     *
+     * @param reader inputStream
+     * @param writer outputStream
+     */
     public ClientListener(ObjectInputStream reader, ObjectOutputStream writer) {
         this.reader = reader;
         this.writer = writer;
     }
 
+    /**
+     * Method receive nickname from client that want to join to the chat.
+     *
+     * @return nickname
+     */
     protected String getClientNickname() {
         String nick = null;
         Object object;
@@ -42,12 +60,24 @@ public class ClientListener {
         return null;
     }
 
+    /**
+     * Rensponsible for creating and adding new client to the chat.
+     *
+     * @param nick clients nickname
+     * @return client object
+     */
     protected Client addClient(String nick) {
         Client client = new Client(reader, writer);
         clients.put(nick, client);
         return client;
     }
 
+    /**
+     * Veryfies if nickname which was chosen by client, isn't already taken.
+     *
+     * @param nick
+     * @return true if nick is not taken or false
+     */
     protected boolean verifyNick(String nick) {
         if (clients.isEmpty()) {
             addClient(nick);
@@ -67,12 +97,18 @@ public class ClientListener {
         return true;
     }
 
+    /**
+     * Sends positive response to client.
+     */
     protected void admitClient() {
         sender.sendToClient(writer, true);
         deliverRoomList();
         deliverUserList();
     }
 
+    /**
+     * Delivers all users list to client.
+     */
     private void deliverUserList() {
         System.out.println("Sending users list...");
         List<String> usersList = new ArrayList<String>(clients.keySet());
@@ -80,6 +116,9 @@ public class ClientListener {
         sender.sendToAll(roomPacket);
     }
 
+    /**
+     * Delivers all chat rooms names list to client.
+     */
     private void deliverRoomList() {
         System.out.println("Sending chat rooms list...");
         sender.sendToClient(writer, chatRoomsList);

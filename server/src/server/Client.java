@@ -3,10 +3,13 @@ package server;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
+/**
+ * Represents chat client.
+ */
 public class Client {
 
     /**
-     * Client's nickname
+     * Client's nickname.
      */
     private String nick;
     /**
@@ -27,7 +30,7 @@ public class Client {
     }
 
     /**
-     * Constructor with clients input
+     * Constructor with with the given clients input stream and output stream.
      *
      * @param inputStream
      * @param outputStream
@@ -37,18 +40,38 @@ public class Client {
         this.inputStream = inputStream;
     }
 
+    /**
+     * Gets the clients stream to write.
+     *
+     * @return output stream
+     */
     public ObjectOutputStream getOutputStream() {
         return outputStream;
     }
 
+    /**
+     * Gets the clients stream to read.
+     *
+     * @return input stream
+     */
     public ObjectInputStream getInputStream() {
         return inputStream;
     }
 
+    /**
+     * Gets clients nickname.
+     *
+     * @return nickname
+     */
     public String getNick() {
         return nick;
     }
 
+    /**
+     * Changes the nickname of client.
+     *
+     * @param nick
+     */
     public void setNick(String nick) {
         this.nick = nick;
     }

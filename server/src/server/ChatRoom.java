@@ -52,6 +52,7 @@ public class ChatRoom {
     /**
      * Creates file for each chat room and puts it to rooms log map.
      * The line argument is name of a chat room.
+     *
      * @param line- chat room name
      */
     private void initializeLogFile(String line) {
@@ -71,6 +72,7 @@ public class ChatRoom {
     /**
      * Is responsible for adding and removing clients from chat rooms list based on flag from RoomPacket received from client.
      * The room argument is name of chat room, that client want to join or leave.
+     *
      * @param room- chat room name
      * @param nick- client's nick
      * @param flag- join/unjoin flag
@@ -99,6 +101,7 @@ public class ChatRoom {
     /**
      * Generates clients nicks list for chat room that is send to clients in room.
      * The room argument is name of chat room.
+     *
      * @param room- name of chat room
      */
     private void generateNickList(String room) {
@@ -108,6 +111,7 @@ public class ChatRoom {
 
     /**
      * Initializes list of clients for chat room, specified by line argument- chat room name.
+     *
      * @param room- name of chat room
      */
     private void createUsersList(String room) {

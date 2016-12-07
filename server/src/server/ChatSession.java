@@ -7,6 +7,10 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 
+/**
+ * Represents chat session while the server is reading messages.
+ */
+
 public class ChatSession implements Runnable {
 
     private ObjectInputStream reader;
