@@ -11,7 +11,6 @@ import java.util.Map;
 import static server.ClientListener.clients;
 
 /**
- * @author Sylwia Üçüncü, Michał Hoja
  * @version 1.0
  * @since 2016.11.05
  * Main class responsible for initialisation of server work and create connect with clients.
@@ -56,7 +55,7 @@ public class Server {
      * Hung up method, which removes client from clients list and close the stream between client and server.
      * The reader argument is client that connection is interrupted.
      *
-     * @param reader
+     * @param reader- client reader stream
      */
     protected void hungUp(ObjectInputStream reader) {
         Iterator iterator = clients.entrySet().iterator();
