@@ -3,8 +3,8 @@ package server;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -91,8 +91,8 @@ public class Server {
      * @return current time
      */
     protected String getCurrentTime() {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
-        String time = dateFormat.format(new Date());
+        ZonedDateTime dateTime = ZonedDateTime.from(ZonedDateTime.now());
+        String time = dateTime.format(DateTimeFormatter.ofPattern("HH:mm:ss"));
         return time;
     }
 
