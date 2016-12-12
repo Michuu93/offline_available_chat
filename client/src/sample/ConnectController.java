@@ -23,8 +23,8 @@ public class ConnectController implements Initializable {
     @FXML
     private Label connectLabel;
 
-    public String server;
-    public int port;
+    private String server;
+    private int port;
 
     public void initialize(URL url, ResourceBundle rb) {
         try {
@@ -42,7 +42,7 @@ public class ConnectController implements Initializable {
         Main.setUserNick(nickField.getText());
         Main.getConnection().connect(server, port);
 
-        if (Main.getConnection().isConnected()) {
+        if (Main.getConnection().getConnectStatus() == Connection.ConnectStatus.CONNECTED) {
             recentSave();
             MainController.getConnectStage().close();
         }
@@ -70,5 +70,14 @@ public class ConnectController implements Initializable {
 
     public void setConnectLabel(String information){
         connectLabel.setText(information);
+    }
+
+
+    public String getServer() {
+        return server;
+    }
+
+    public int getPort() {
+        return port;
     }
 }

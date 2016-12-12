@@ -1,5 +1,7 @@
 package sample;
 
+import javafx.application.Platform;
+
 import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -8,9 +10,15 @@ public class Connection {
     private Socket socket = null;
     private Runnable readerJob = new ReaderThread();
     private Thread readerThread;
-    private boolean connected = false;
     private ObjectInputStream reader;
     private ObjectOutputStream writer;
+    private static int RECONNECTING_TIME = 150;
+
+    public enum ConnectStatus {
+        CONNECTED, DISCONNECTED, RECONNECTING
+    }
+
+    private ConnectStatus connectStatus = ConnectStatus.DISCONNECTED;
 
     public void connect(String server, int port) throws IOException, ClassNotFoundException {
         try {
@@ -26,7 +34,7 @@ public class Connection {
                 System.out.println("NickCheck: " + nickCheck);
                 if (nickCheck == true) {
                     System.out.println("Connected to " + server + ":" + port);
-                    setConnected(true);
+                    setConnectStatus(ConnectStatus.CONNECTED);
                     getRoomsList();
                     startReaderThread();
                 } else if (nickCheck == false) {
@@ -36,14 +44,14 @@ public class Connection {
                 }
             }
         } catch (IOException e) {
-            //e.printStackTrace();
+            e.printStackTrace();
             Main.getConnectController().setConnectLabel("Server is not responding!");
         }
     }
 
     public void disconnect() throws IOException {
-        if (isConnected()) {
-            setConnected(false);
+        if (getConnectStatus() == ConnectStatus.CONNECTED) {
+            setConnectStatus(ConnectStatus.DISCONNECTED);
             readerThread.interrupt();
             socket.close();
             Main.getMainController().clearRoomsList();
@@ -56,6 +64,47 @@ public class Connection {
         }
     }
 
+    public void reconnect() throws IOException, ClassNotFoundException, InterruptedException {
+        if (getConnectStatus() == ConnectStatus.CONNECTED) {
+            setConnectStatus(ConnectStatus.RECONNECTING);
+            readerThread.interrupt();
+            socket.close();
+            Thread thread = new Thread() {
+                @Override
+                public void run() {
+                    int waitedSeconds = 0;
+                    while (waitedSeconds < RECONNECTING_TIME) {
+                        System.out.println("Reconnecting! - " + waitedSeconds + " sec");
+                        Platform.runLater(() -> {
+                            try {
+                                Main.getConnection().connect(Main.getConnectController().getServer(), Main.getConnectController().getPort());
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            } catch (ClassNotFoundException e) {
+                                e.printStackTrace();
+                            }
+                        });
+                        try {
+                            Thread.sleep(2000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        waitedSeconds += 2;
+                    }
+                    Platform.runLater(() -> {
+                        try {
+                            disconnect();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    });
+                    Thread.currentThread().interrupt();
+                }
+            };
+            thread.start();
+        }
+    }
+
     public ObjectInputStream getReader() {
         return reader;
     }
@@ -64,13 +113,13 @@ public class Connection {
         return writer;
     }
 
-    public boolean isConnected() {
-        return connected;
+    public ConnectStatus getConnectStatus() {
+        return connectStatus;
     }
 
-    public void setConnected(boolean connected) {
-        this.connected = connected;
-        Main.getMainController().setStatus(connected);
+    public void setConnectStatus(ConnectStatus connectStatus) {
+        this.connectStatus = connectStatus;
+        Main.getMainController().setStatus(connectStatus);
     }
 
     public void startReaderThread() {

@@ -69,13 +69,18 @@ public class MainController {
     }
 
     @FXML
-    public void setStatus(boolean isConnected) {
-        if (isConnected) {
+    public void setStatus(Connection.ConnectStatus connectStatus) {
+        if (connectStatus == Connection.ConnectStatus.CONNECTED) {
             connectionStatus.setTextFill(Color.GREEN);
             connectionStatus.setText("connected");
-        } else {
+        }
+        if (connectStatus == Connection.ConnectStatus.DISCONNECTED) {
             connectionStatus.setTextFill(Color.RED);
             connectionStatus.setText("disconnected");
+        }
+        if (connectStatus == Connection.ConnectStatus.RECONNECTING) {
+            connectionStatus.setTextFill(Color.ORANGE);
+            connectionStatus.setText("reconnecting");
         }
     }
 
@@ -85,12 +90,8 @@ public class MainController {
     }
 
     public void fillUsersList(String room) {
-        if (Main.getRoomUsersList(room) != null)
-            usersListView.setItems(FXCollections.observableList(Main.getRoomUsersList(room)));
-        else {
-            usersListView.getItems().clear();
-            usersListView.refresh();
-        }
+        usersListView.setItems(FXCollections.observableList(Main.getRoomUsersList(room)));
+        System.out.println("Fill users list in room: " + room + " list: " + FXCollections.observableList(Main.getRoomUsersList(room)));
     }
 
     @FXML
@@ -114,7 +115,7 @@ public class MainController {
 
     @FXML
     public void sendClicked() {
-        if (Main.getConnection().isConnected()) {
+        if (Main.getConnection().getConnectStatus() == Connection.ConnectStatus.CONNECTED) {
             String roomID = tabPane.getSelectionModel().getSelectedItem().getText();
             String message = messageField.getText();
 
@@ -169,15 +170,14 @@ public class MainController {
     }
 
     public void changeTab(Event e) {
-        if (Main.getConnection().isConnected()) {
+        if (Main.getConnection().getConnectStatus() == Connection.ConnectStatus.CONNECTED) {
             if (!tabSwitch) {
                 tabSwitch = true;
             } else {
                 Tab tabSwitched = (Tab) e.getSource();
-                //clearUsersList();
+                System.out.println("Tab switched to: " + tabSwitched.getText());
                 fillUsersList(tabSwitched.getText());
                 tabSwitch = false;
-                System.out.println("Tab switched to: " + tabSwitched.getText());
             }
         }
     }

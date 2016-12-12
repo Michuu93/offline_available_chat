@@ -75,12 +75,15 @@ public class Main extends Application {
         if (Main.roomUsersList.containsKey(room)) return Main.roomUsersList.get(room);
         else {
             System.out.println("List not exist! - " + room);
-            return null;
+            return new ArrayList<String>();
         }
     }
 
     public static void setRoomUsersList(String room, List<String> roomUsers) {
-        if (roomUsersList.containsKey(room)) Main.roomUsersList.replace(room, roomUsers);
+        if (roomUsersList.containsKey(room)){
+            Main.roomUsersList.remove(room);
+            Main.roomUsersList.put(room, roomUsers);
+        }
         else Main.roomUsersList.put(room, roomUsers);
     }
 
