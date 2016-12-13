@@ -52,10 +52,10 @@ public class Server {
     }
 
     /**
-     * Hung up method, which removes client from clients list and close the stream between client and server.
-     * The reader argument is client that connection is interrupted.
+     * Hung up method, which close the stream between client and server.
+     * The stream argument is a client that connection was interrupted.
      *
-     * @param stream- client reader stream
+     * @param stream- client reader/writer stream
      */
     protected void hungUp(Object stream) {
 
@@ -80,6 +80,12 @@ public class Server {
         }
     }
 
+    /**
+     * Removes client from clients list
+     *
+     * @param iterator
+     * @param client
+     */
     private void disconnect(Iterator iterator, Map.Entry<String, Client> client) {
         System.out.println(client.getKey() + " is diconnected.");
         clients.remove(client);
