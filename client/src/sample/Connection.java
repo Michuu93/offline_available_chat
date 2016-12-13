@@ -35,44 +35,58 @@ public class Connection {
      * @throws ClassNotFoundException
      */
     public void connect(String server, int port) throws IOException, ClassNotFoundException {
-        try {
-            socket = new Socket(server, port);
-            writer = new ObjectOutputStream(new BufferedOutputStream(socket.getOutputStream()));
-            writer.flush();
-            reader = new ObjectInputStream(new BufferedInputStream(socket.getInputStream()));
-            sendNick();
-            Boolean nickCheck;
-            if ((nickCheck = (Boolean) reader.readObject()) != null) {
-                System.out.println("NickCheck: " + nickCheck);
-                if (nickCheck == true) {
-                    System.out.println("Connected to " + server + ":" + port);
-                    setConnectStatus(ConnectStatus.CONNECTED);
-                    getRoomsList();
-                    startReaderThread();
-                } else if (nickCheck == false) {
-                    System.out.println("Nick is already in use! Disconnect!");
-                    Main.getConnectController().setConnectLabel("Nick is already in use, please choose another!");
-                    disconnect();
+        Thread connectThread = new Thread() {
+            @Override
+            public void run() {
+                try {
+                    socket = new Socket(server, port);
+                    writer = new ObjectOutputStream(new BufferedOutputStream(socket.getOutputStream()));
+                    writer.flush();
+                    reader = new ObjectInputStream(new BufferedInputStream(socket.getInputStream()));
+                    Platform.runLater(() -> Main.getConnectController().recentSave());
+                    Platform.runLater(() -> Main.getMainController().getConnectStage().close());
+                    Platform.runLater(() ->  sendNick());
+                    Boolean nickCheck;
+                    if ((nickCheck = (Boolean) reader.readObject()) != null) {
+                        System.out.println("NickCheck: " + nickCheck);
+                        if (nickCheck == true) {
+                            System.out.println("Connected to " + server + ":" + port);
+                            Platform.runLater(() -> setConnectStatus(ConnectStatus.CONNECTED));
+                            Platform.runLater(() -> getRoomsList());
+                            Platform.runLater(() -> startReaderThread());
+                        } else if (nickCheck == false) {
+                            System.out.println("Nick is already in use! Disconnect!");
+                            Platform.runLater(() -> Main.getConnectController().setConnectLabel("Nick is already in use, please choose another!"));
+                            Platform.runLater(() -> disconnect());
+                        }
+                    }
+                } catch (IOException e) {
+                    if (connectStatus == ConnectStatus.DISCONNECTED) {
+                        e.printStackTrace();
+                        Platform.runLater(() -> Main.getConnectController().setConnectLabel("Server is not responding!"));
+                    }
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
                 }
+                Thread.currentThread().interrupt();
             }
-        } catch (IOException e) {
-            if (connectStatus == ConnectStatus.DISCONNECTED) {
-                e.printStackTrace();
-                Main.getConnectController().setConnectLabel("Server is not responding!");
-            }
-        }
+        };
+        connectThread.start();
     }
 
     /**
      * If connected, disconnect from the server.
      *
-     * @throws IOException
      */
-    public void disconnect() throws IOException {
+    public void disconnect() {
         if (getConnectStatus() == ConnectStatus.CONNECTED) {
             setConnectStatus(ConnectStatus.DISCONNECTED);
             readerThread.interrupt();
-            socket.close();
+            try {
+                socket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             Main.getMainController().clearRoomsList();
             Main.getChatRoomsList().clear();
             Main.getJoinedChatRoomsTabs().clear();
@@ -85,17 +99,17 @@ public class Connection {
 
     /**
      * Trying to reconnect to the server from the collaboration of about two seconds.
-     *
-     * @throws IOException
-     * @throws ClassNotFoundException
-     * @throws InterruptedException
      */
-    public void reconnect() throws IOException, ClassNotFoundException, InterruptedException {
+    public void reconnect() {
         if (getConnectStatus() == ConnectStatus.CONNECTED) {
             setConnectStatus(ConnectStatus.RECONNECTING);
             readerThread.interrupt();
-            socket.close();
-            Thread thread = new Thread() {
+            try {
+                socket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            Thread reconnectThread = new Thread() {
                 @Override
                 public void run() {
                     int waitedSeconds = 0;
@@ -107,7 +121,7 @@ public class Connection {
                             } catch (IOException e) {
                                 //e.printStackTrace();
                             } catch (ClassNotFoundException e) {
-                                //.printStackTrace();
+                                //e.printStackTrace();
                             }
                         });
                         try {
@@ -121,7 +135,7 @@ public class Connection {
                     Thread.currentThread().interrupt();
                 }
             };
-            thread.start();
+            reconnectThread.start();
         }
     }
 
@@ -169,23 +183,28 @@ public class Connection {
 
     /**
      * Send nick to server.
-     *
-     * @throws IOException
      */
-    public void sendNick() throws IOException {
-        writer.writeObject(Main.getUserNick());
-        writer.flush();
+    public void sendNick() {
+        try {
+            writer.writeObject(Main.getUserNick());
+            writer.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         System.out.println("Send nick: " + Main.getUserNick());
     }
 
     /**
      * Get rooms list and fill into roomsListView.
-     *
-     * @throws IOException
-     * @throws ClassNotFoundException
      */
-    public void getRoomsList() throws IOException, ClassNotFoundException {
-        Main.setChatRoomsList((ArrayList<String>) reader.readObject());
+    public void getRoomsList() {
+        try {
+            Main.setChatRoomsList((ArrayList<String>) reader.readObject());
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
         Main.getMainController().fillRoomsList();
     }
 

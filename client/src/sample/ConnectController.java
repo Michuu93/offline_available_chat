@@ -49,16 +49,13 @@ public class ConnectController implements Initializable {
      */
     @FXML
     public void connectButtonClick() throws IOException, ClassNotFoundException {
+        if (Main.getConnection().getConnectStatus() == Connection.ConnectStatus.CONNECTED) Main.getConnection().disconnect();
         String server = serverField.getText();
         Main.getConnection().setServer(server);
         Integer port = Integer.parseInt(portField.getText());
         Main.getConnection().setPort(port);
         Main.setUserNick(nickField.getText());
         Main.getConnection().connect(server, port);
-        if (Main.getConnection().getConnectStatus() == Connection.ConnectStatus.CONNECTED) {
-            recentSave();
-            MainController.getConnectStage().close();
-        }
     }
 
     /**
@@ -80,11 +77,14 @@ public class ConnectController implements Initializable {
 
     /**
      * Save recent server to recentServer.txt.
-     *
-     * @throws FileNotFoundException
      */
-    private void recentSave() throws FileNotFoundException {
-        PrintWriter writer = new PrintWriter("recentServer.txt");
+    public void recentSave() {
+        PrintWriter writer = null;
+        try {
+            writer = new PrintWriter("recentServer.txt");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
         writer.println(serverField.getText());
         writer.println(portField.getText());
         writer.print(nickField.getText());

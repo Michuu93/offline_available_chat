@@ -32,15 +32,15 @@ public class ReaderThread implements Runnable {
                     }
                 }
             } catch (SocketException e) {
-                e.printStackTrace();
+                //e.printStackTrace();
                 System.out.println("SocketException - Disconnect!");
                 reconnect();
             } catch (IOException e) {
-                e.printStackTrace();
+                //e.printStackTrace();
                 System.out.println("IOException - Reader error! - Disconnect!");
                 killThread();
             } catch (ClassNotFoundException e) {
-                e.printStackTrace();
+                //e.printStackTrace();
                 System.out.println("ClassNotFoundException - Reader ClassNotFound! - Disconnect!");
                 killThread();
             }
@@ -51,13 +51,7 @@ public class ReaderThread implements Runnable {
      * Kill Reader Thread.
      */
     public void killThread() {
-        Platform.runLater(() -> {
-            try {
-                Main.getConnection().disconnect();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        });
+        Platform.runLater(() -> Main.getConnection().disconnect());
         Thread.currentThread().interrupt();
     }
 
@@ -65,16 +59,6 @@ public class ReaderThread implements Runnable {
      * Calls the reconnect method (when the server disconnects).
      */
     public void reconnect() {
-        Platform.runLater((() -> {
-            try {
-                Main.getConnection().reconnect();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }));
+        Platform.runLater((() -> Main.getConnection().reconnect()));
     }
 }

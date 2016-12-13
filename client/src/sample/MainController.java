@@ -185,15 +185,17 @@ public class MainController {
     }
 
     /**
-     * Call joinRoom when double-click on room name.
+     * Call joinRoom when double-click on room name if connectStatus is CONNECTED.
      *
      * @param click
      */
     public void roomClick(MouseEvent click) {
-        if (click.getClickCount() == 2) {
-            String currentItemSelected = (String) roomsListView.getSelectionModel().getSelectedItem();
-            if ((currentItemSelected != null) && !Main.getJoinedChatRoomsTabs().containsKey(currentItemSelected)) {
-                joinRoom(currentItemSelected);
+        if (Main.getConnection().getConnectStatus() == Connection.ConnectStatus.CONNECTED) {
+            if (click.getClickCount() == 2) {
+                String currentItemSelected = (String) roomsListView.getSelectionModel().getSelectedItem();
+                if ((currentItemSelected != null) && !Main.getJoinedChatRoomsTabs().containsKey(currentItemSelected)) {
+                    joinRoom(currentItemSelected);
+                }
             }
         }
     }
