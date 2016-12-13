@@ -37,7 +37,7 @@ public class ChatRoom {
         try {
             File file = new File(filename);
             BufferedReader reader = new BufferedReader(new FileReader(file));
-            String line = null;
+            String line;
             while ((line = reader.readLine()) != null) {
                 chatRoomsList.add(line);
                 createUsersList(line);
@@ -60,8 +60,7 @@ public class ChatRoom {
 
         try {
             String filename = line + ".ser";
-            FileOutputStream file = null;
-            file = new FileOutputStream(filename, true);
+            FileOutputStream file = new FileOutputStream(filename, true);
             roomsLog.put(line, file);
         } catch (FileNotFoundException e) {
             e.printStackTrace();

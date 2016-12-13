@@ -12,6 +12,9 @@ import static server.ClientListener.clients;
  */
 public class Sender {
 
+    private Server server = new Server();
+    private ObjectOutputStream writer;
+
 
     /**
      * Sends object to every clients connected with server.
@@ -22,10 +25,11 @@ public class Sender {
         System.out.println("Writing to all...");
         for (Map.Entry<String, Client> client : clients.entrySet()) {
             try {
-                client.getValue().getOutputStream().writeObject(message);
-                client.getValue().getOutputStream().flush();
+                writer = client.getValue().getOutputStream();
+                writer.writeObject(message);
+                writer.flush();
             } catch (Exception ex) {
-                ex.printStackTrace();
+                server.hungUp(writer);
             }
         }
     }
@@ -40,11 +44,12 @@ public class Sender {
         System.out.println("Writing to users in room: " + room);
         try {
             for (Client client : usersInRoom.get(room)) {
-                client.getOutputStream().writeObject(message);
-                client.getOutputStream().flush();
+                writer = client.getOutputStream();
+                writer.writeObject(message);
+                writer.flush();
             }
         } catch (Exception ex) {
-            ex.printStackTrace();
+            server.hungUp(writer);
         }
     }
 
@@ -56,11 +61,11 @@ public class Sender {
      */
     protected void sendToClient(ObjectOutputStream client, Object object) {
         try {
-            ObjectOutputStream writer = client;
+            writer = client;
             writer.writeObject(object);
             writer.flush();
         } catch (IOException e) {
-            e.printStackTrace();
+            server.hungUp(writer);
         }
     }
 }

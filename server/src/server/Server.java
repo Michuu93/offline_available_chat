@@ -1,6 +1,9 @@
 package server;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.time.ZonedDateTime;
@@ -17,9 +20,6 @@ import static server.ClientListener.clients;
  */
 
 public class Server {
-
-    private ClientListener clientListener;
-    private ChatSession chatSession;
 
     public static void main(String[] args) {
         new ChatRoom().loadRooms();
@@ -38,9 +38,9 @@ public class Server {
                 clientOutputStream.flush();
                 ObjectInputStream clientInputStream = new ObjectInputStream(new BufferedInputStream(clientSocket.getInputStream()));
 
-                chatSession = new ChatSession(clientInputStream);
+                ChatSession chatSession = new ChatSession(clientInputStream);
 
-                clientListener = new ClientListener(clientInputStream, clientOutputStream);
+                ClientListener clientListener = new ClientListener(clientInputStream, clientOutputStream);
                 if (clientListener.verifyNick(clientListener.getClientNickname())) {
                     Thread thread = new Thread(chatSession);
                     thread.start();
@@ -55,34 +55,35 @@ public class Server {
      * Hung up method, which removes client from clients list and close the stream between client and server.
      * The reader argument is client that connection is interrupted.
      *
-     * @param reader- client reader stream
+     * @param stream- client reader stream
      */
-    protected void hungUp(ObjectInputStream reader) {
+    protected void hungUp(Object stream) {
+
+        ObjectInputStream reader;
+        ObjectOutputStream writer;
         Iterator iterator = clients.entrySet().iterator();
+
         while (iterator.hasNext()) {
             Map.Entry<String, Client> client = (Map.Entry) iterator.next();
 
-            if (reader == client.getValue().getInputStream()) {
-                try {
-                    System.out.println(client.getKey() + " is diconnected.");
-                    clients.remove(client);
+            try {
+                if (stream == (reader = client.getValue().getInputStream())) {
                     reader.close();
-                    iterator.remove();
-
-                } catch (IOException e) {
-                    e.printStackTrace();
+                    disconnect(iterator, client);
+                } else if (stream == (writer = client.getValue().getOutputStream())) {
+                    writer.close();
+                    disconnect(iterator, client);
                 }
+            } catch (Exception ex) {
+                ex.printStackTrace();
             }
         }
     }
 
-    /**
-     *
-     */
-    private void verifyClientList() {
-        if (!clients.isEmpty()) {
-            new Serializer().deserialize();
-        }
+    private void disconnect(Iterator iterator, Map.Entry<String, Client> client) {
+        System.out.println(client.getKey() + " is diconnected.");
+        clients.remove(client);
+        iterator.remove();
     }
 
     /**
