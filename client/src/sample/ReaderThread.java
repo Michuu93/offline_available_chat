@@ -7,26 +7,27 @@ import javafx.application.Platform;
 import java.io.IOException;
 import java.net.SocketException;
 
+/**
+ * Reader Thread - read messages from server.
+ */
 public class ReaderThread implements Runnable {
     private Object received;
 
     @Override
     public void run() {
-        while (true) {
-            //Read from server
+        while (Main.getConnection().getConnectStatus() == Connection.ConnectStatus.CONNECTED) {
             try {
-                if ((Main.getConnection().getConnectStatus() == Connection.ConnectStatus.CONNECTED) && ((received = Main.getConnection().getReader().readObject()) != null)) {
+                if ((received = Main.getConnection().getReader().readObject()) != null) {
                     if (received instanceof MessagePacket) {
                         MessagePacket msg = (MessagePacket) received;
                         System.out.println("Received MessagePacket! Room ID: " + msg.getRoom() + ", Message: " + msg.getMessage());
-                        Platform.runLater( () -> Main.getMainController().viewMessage(msg));
+                        Platform.runLater(() -> Main.getMainController().viewMessage(msg));
                     } else if (received instanceof UsersPacket) {
                         UsersPacket roomUsers = (UsersPacket) received;
                         Platform.runLater(() -> Main.setRoomUsersList(roomUsers.getRoom(), roomUsers.getClientsList()));
                         System.out.println("Received UsersPacket! Room ID: " + roomUsers.getRoom() + ", Users List: " + roomUsers.getClientsList());
                         Platform.runLater(() -> Main.getMainController().fillUsersList(roomUsers.getRoom()));
-                    }
-                    else {
+                    } else {
                         System.out.println("Received something else!");
                     }
                 }
@@ -46,6 +47,9 @@ public class ReaderThread implements Runnable {
         }
     }
 
+    /**
+     * Kill Reader Thread.
+     */
     public void killThread() {
         Platform.runLater(() -> {
             try {
@@ -57,6 +61,9 @@ public class ReaderThread implements Runnable {
         Thread.currentThread().interrupt();
     }
 
+    /**
+     * Calls the reconnect method (when the server disconnects).
+     */
     public void reconnect() {
         Platform.runLater((() -> {
             try {

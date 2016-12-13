@@ -13,6 +13,9 @@ import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.Scanner;
 
+/**
+ * Connect Window Controller class.
+ */
 public class ConnectController implements Initializable {
     @FXML
     private TextField serverField;
@@ -23,9 +26,12 @@ public class ConnectController implements Initializable {
     @FXML
     private Label connectLabel;
 
-    private String server;
-    private int port;
-
+    /**
+     * Initialize Connect Window (load recent server).
+     *
+     * @param url
+     * @param rb
+     */
     public void initialize(URL url, ResourceBundle rb) {
         try {
             recentLoad();
@@ -35,19 +41,31 @@ public class ConnectController implements Initializable {
         }
     }
 
+    /**
+     * Connect to the server and save to recent.
+     *
+     * @throws IOException
+     * @throws ClassNotFoundException
+     */
     @FXML
     public void connectButtonClick() throws IOException, ClassNotFoundException {
-        server = serverField.getText();
-        port = Integer.parseInt(portField.getText());
+        String server = serverField.getText();
+        Main.getConnection().setServer(server);
+        Integer port = Integer.parseInt(portField.getText());
+        Main.getConnection().setPort(port);
         Main.setUserNick(nickField.getText());
         Main.getConnection().connect(server, port);
-
         if (Main.getConnection().getConnectStatus() == Connection.ConnectStatus.CONNECTED) {
             recentSave();
             MainController.getConnectStage().close();
         }
     }
 
+    /**
+     * Read recent server from recentServer.txt and show.
+     *
+     * @throws FileNotFoundException
+     */
     private void recentLoad() throws FileNotFoundException {
         File recentServer = new File("recentServer.txt");
         Scanner reader = new Scanner(recentServer);
@@ -60,6 +78,11 @@ public class ConnectController implements Initializable {
         reader.close();
     }
 
+    /**
+     * Save recent server to recentServer.txt.
+     *
+     * @throws FileNotFoundException
+     */
     private void recentSave() throws FileNotFoundException {
         PrintWriter writer = new PrintWriter("recentServer.txt");
         writer.println(serverField.getText());
@@ -68,16 +91,12 @@ public class ConnectController implements Initializable {
         writer.close();
     }
 
-    public void setConnectLabel(String information){
+    /**
+     * Set text in connectLabel.
+     *
+     * @param information - information text.
+     */
+    public void setConnectLabel(String information) {
         connectLabel.setText(information);
-    }
-
-
-    public String getServer() {
-        return server;
-    }
-
-    public int getPort() {
-        return port;
     }
 }
