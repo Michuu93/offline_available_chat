@@ -33,15 +33,15 @@ public class ReaderThread implements Runnable {
                 }
             } catch (SocketException e) {
                 //e.printStackTrace();
-                System.out.println("SocketException - Disconnect!");
+                System.out.println("SocketException - Reconnect!");
                 reconnect();
             } catch (IOException e) {
-                //e.printStackTrace();
-                System.out.println("IOException - Reader error! - Disconnect!");
+                e.printStackTrace();
+                System.out.println("IOException - Reader error!");
                 killThread();
             } catch (ClassNotFoundException e) {
-                //e.printStackTrace();
-                System.out.println("ClassNotFoundException - Reader ClassNotFound! - Disconnect!");
+                e.printStackTrace();
+                System.out.println("ClassNotFoundException - Reader ClassNotFound!!");
                 killThread();
             }
         }

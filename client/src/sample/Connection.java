@@ -1,10 +1,14 @@
 package sample;
 
+import common.RoomPacket;
 import javafx.application.Platform;
+import javafx.scene.control.ListView;
 
 import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Connection class.
@@ -44,7 +48,6 @@ public class Connection {
                     writer.flush();
                     reader = new ObjectInputStream(new BufferedInputStream(socket.getInputStream()));
                     Platform.runLater(() -> Main.getConnectController().recentSave());
-                    Platform.runLater(() -> Main.getMainController().getConnectStage().close());
                     Platform.runLater(() ->  sendNick());
                     Boolean nickCheck;
                     if ((nickCheck = (Boolean) reader.readObject()) != null) {
@@ -54,6 +57,7 @@ public class Connection {
                             Platform.runLater(() -> setConnectStatus(ConnectStatus.CONNECTED));
                             Platform.runLater(() -> getRoomsList());
                             Platform.runLater(() -> startReaderThread());
+                            Platform.runLater(() -> Main.getMainController().getConnectStage().close());
                         } else if (nickCheck == false) {
                             System.out.println("Nick is already in use! Disconnect!");
                             Platform.runLater(() -> Main.getConnectController().setConnectLabel("Nick is already in use, please choose another!"));
@@ -63,6 +67,7 @@ public class Connection {
                 } catch (IOException e) {
                     if (connectStatus == ConnectStatus.DISCONNECTED) {
                         e.printStackTrace();
+                        System.out.println("Server is not responding!");
                         Platform.runLater(() -> Main.getConnectController().setConnectLabel("Server is not responding!"));
                     }
                 } catch (ClassNotFoundException e) {
@@ -93,6 +98,7 @@ public class Connection {
             Main.getMainController().closeTabs();
             Main.getMainController().clearUsersList();
             Main.clearRoomUsersList();
+            Main.getMainController().clearRoomListView();
             System.out.println("Disconnected!");
         }
     }
@@ -103,7 +109,7 @@ public class Connection {
     public void reconnect() {
         if (getConnectStatus() == ConnectStatus.CONNECTED) {
             setConnectStatus(ConnectStatus.RECONNECTING);
-            readerThread.interrupt();
+            Platform.runLater(() -> readerThread.interrupt());
             try {
                 socket.close();
             } catch (IOException e) {
@@ -131,11 +137,23 @@ public class Connection {
                         }
                         waitedSeconds += 2;
                     }
+                    rejoinRooms();
                     Writer.sendMessagesToSend();
                     Thread.currentThread().interrupt();
                 }
             };
             reconnectThread.start();
+        }
+    }
+
+    /**
+     * Rejoin rooms after reconnect.
+     */
+    public void rejoinRooms() {
+        for (Map.Entry<String, ListView> entry : Main.getJoinedChatRoomsTabs().entrySet())
+        {
+            RoomPacket roomPacket = new RoomPacket(entry.getKey(), RoomPacket.Join.JOIN);
+            Writer.writeRoomPacket(roomPacket);
         }
     }
 

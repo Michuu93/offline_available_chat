@@ -208,8 +208,6 @@ public class MainController {
     public void joinRoom(String joinRoom) {
         Tab newTab = new Tab();
         newTab.setText(joinRoom);
-        newTab.setOnSelectionChanged(event -> changeTab(event));
-        newTab.setOnClosed(event -> leaveRoom(event));
         tabPane.getTabs().add(newTab);
         tabPane.getSelectionModel().select(newTab);
         ListView newListView = new ListView();
@@ -217,6 +215,8 @@ public class MainController {
         Main.getJoinedChatRoomsTabs().put(joinRoom, newListView);
         RoomPacket roomPacket = new RoomPacket(joinRoom, RoomPacket.Join.JOIN);
         Writer.writeRoomPacket(roomPacket);
+        newTab.setOnSelectionChanged(event -> changeTab(event));
+        newTab.setOnClosed(event -> leaveRoom(event));
     }
 
     /**
@@ -266,6 +266,13 @@ public class MainController {
             roomTab.getItems().add(message.getDate() + " [" + message.getNick() + "]: " + message.getMessage() + "\n");
             roomTab.scrollTo(roomTab.getItems().size() - 1);
         }
+    }
+
+    /**
+     * Clear waiting room list view.
+     */
+    public void clearRoomListView() {
+        waitingRoomListView.getItems().clear();
     }
 
     /**
