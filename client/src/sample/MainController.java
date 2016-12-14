@@ -21,7 +21,6 @@ import java.io.IOException;
  */
 public class MainController {
     private static Stage connectStage;
-    private static Boolean tabSwitch = false;
     @FXML
     private Label connectionStatus;
     @FXML
@@ -241,13 +240,10 @@ public class MainController {
      */
     public void changeTab(Event e) {
         if (Main.getConnection().getConnectStatus() == Connection.ConnectStatus.CONNECTED) {
-            if (!tabSwitch) {
-                tabSwitch = true;
-            } else {
-                Tab tabSwitched = (Tab) e.getSource();
+            Tab tabSwitched = (Tab) e.getSource();
+            if (tabSwitched.isSelected()) {
                 System.out.println("Tab switched to: " + tabSwitched.getText());
                 fillUsersList(tabSwitched.getText());
-                tabSwitch = false;
             }
         }
     }
