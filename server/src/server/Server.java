@@ -64,15 +64,18 @@ public class Server {
         Iterator iterator = clients.entrySet().iterator();
 
         while (iterator.hasNext()) {
+
             Map.Entry<String, Client> client = (Map.Entry) iterator.next();
 
             try {
                 if (stream == (reader = client.getValue().getInputStream())) {
                     reader.close();
-                    disconnect(iterator, client);
+                    System.out.println(client.getKey() + " is diconnected.");
+                    iterator.remove();
                 } else if (stream == (writer = client.getValue().getOutputStream())) {
                     writer.close();
-                    disconnect(iterator, client);
+                    System.out.println(client.getKey() + " is diconnected.");
+                    iterator.remove();
                 }
             } catch (Exception ex) {
                 ex.printStackTrace();
@@ -80,17 +83,7 @@ public class Server {
         }
     }
 
-    /**
-     * Removes client from clients list
-     *
-     * @param iterator
-     * @param client
-     */
-    private void disconnect(Iterator iterator, Map.Entry<String, Client> client) {
-        System.out.println(client.getKey() + " is diconnected.");
-        clients.remove(client);
-        iterator.remove();
-    }
+
 
     /**
      * Returns current time
