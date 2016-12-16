@@ -9,8 +9,11 @@ import java.net.Socket;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
+import static server.ChatRoom.generateNickList;
+import static server.ChatRoom.usersInRoom;
 import static server.ClientListener.clients;
 
 /**
@@ -52,45 +55,66 @@ public class Server {
     }
 
     /**
-     * Hung up method, which close the stream between client and server.
+     * Hung up method.
      * The stream argument is a client that connection was interrupted.
      *
-     * @param stream- client reader/writer stream
+     * @param writer- client writer stream
      */
-    protected void hungUp(Object stream) {
+    protected void hungUp(ObjectOutputStream writer) {
+        removeFromList(writer);
+        removeFromRooms(writer);
+    }
 
-        ObjectInputStream reader;
-        ObjectOutputStream writer;
+    /**
+     * Close the stream between client and server and remove client from clients list.
+     *
+     * @param writer- client writer stream
+     */
+    protected void removeFromList(ObjectOutputStream writer) {
         Iterator iterator = clients.entrySet().iterator();
-
         while (iterator.hasNext()) {
+
             Map.Entry<String, Client> client = (Map.Entry) iterator.next();
 
             try {
-                if (stream == (reader = client.getValue().getInputStream())) {
-                    reader.close();
-                    disconnect(iterator, client);
-                } else if (stream == (writer = client.getValue().getOutputStream())) {
+                if (writer == client.getValue().getOutputStream()) {
+                    Client removed  = client.getValue();
+                    removed.getInputStream().close();
                     writer.close();
-                    disconnect(iterator, client);
+                    System.out.println(client.getKey() + " is diconnected.");
+                    iterator.remove();
                 }
             } catch (Exception ex) {
-                ex.printStackTrace();
+
             }
         }
     }
 
     /**
-     * Removes client from clients list
+     * Remove clients from lists of clients in each room.
      *
-     * @param iterator
-     * @param client
+     * @param writer- client writer stream
      */
-    private void disconnect(Iterator iterator, Map.Entry<String, Client> client) {
-        System.out.println(client.getKey() + " is diconnected.");
-        clients.remove(client);
-        iterator.remove();
+
+    protected void removeFromRooms(ObjectOutputStream writer) {
+        try {
+
+            for (List<Client> list : usersInRoom.values()) {
+                for (int i = 0; i < list.size(); i++)
+                    if (writer == list.get(i).getOutputStream()) {
+                        list.remove(i);
+                    }
+            }
+
+            for (String room : usersInRoom.keySet()) {
+                generateNickList(room);
+            }
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
+
 
     /**
      * Returns current time

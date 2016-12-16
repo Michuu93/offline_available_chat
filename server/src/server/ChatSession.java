@@ -53,9 +53,9 @@ public class ChatSession implements Runnable {
                 }
             } catch (EOFException e) {
                 complete = false;
-                server.hungUp(reader);
+                //server.hungUp(reader);
             } catch (IOException e) {
-                server.hungUp(reader);
+                //server.hungUp(reader);
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
             }
@@ -87,10 +87,10 @@ public class ChatSession implements Runnable {
 
             if (room.equals(LOUNGE)) {
                 sender.sendToAll(messagePacket);
-                //serializer.serialize(LOUNGE, messagePacket);
+                serializer.serialize(LOUNGE, messagePacket);
             } else {
                 sender.sendToUsersInRoom(room, messagePacket);
-                //serializer.serialize(room, messagePacket);
+                serializer.serialize(room, messagePacket);
             }
             System.out.println(messagePacket.getDate() + ": Read message from client from " + room + ": " + messagePacket.getMessage());
         }
