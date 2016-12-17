@@ -77,10 +77,19 @@ public class Server {
             Map.Entry<String, Client> client = (Map.Entry) iterator.next();
 
             try {
+<<<<<<< HEAD
                 if (writer == client.getValue().getOutputStream()) {
-                    Client removed = client.getValue();
+                    Client removed  = client.getValue();
                     removed.getInputStream().close();
+=======
+                if (stream == (reader = client.getValue().getInputStream())) {
+                    reader.close();
+                    System.out.println(client.getKey() + " is diconnected.");
+                    iterator.remove();
+                } else if (stream == (writer = client.getValue().getOutputStream())) {
+>>>>>>> 0fdce105e6217f6af3d18980a81bdd4d16381531
                     writer.close();
+                    System.out.println(client.getKey() + " is diconnected.");
                     iterator.remove();
                 }
             } catch (Exception ex) {
@@ -89,6 +98,7 @@ public class Server {
         }
     }
 
+<<<<<<< HEAD
     /**
      * Remove clients from lists of clients in each room.
      *
@@ -113,6 +123,9 @@ public class Server {
             ex.printStackTrace();
         }
     }
+=======
+
+>>>>>>> 0fdce105e6217f6af3d18980a81bdd4d16381531
 
 
     /**
