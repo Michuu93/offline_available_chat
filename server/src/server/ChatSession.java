@@ -19,7 +19,7 @@ public class ChatSession implements Runnable {
     private Sender sender = new Sender();
 
     protected static final String LOUNGE = "Waiting room";
-    
+
     public ChatSession(ObjectInputStream reader) {
         try {
             this.reader = reader;
@@ -47,8 +47,6 @@ public class ChatSession implements Runnable {
                         readMessage((MessagePacket) object);
                     } else if (object instanceof RoomPacket) {
                         updateListing((RoomPacket) object);
-                    } else {
-                        System.out.println("Sth else - " + object);
                     }
                 }
             } catch (EOFException e) {
@@ -62,8 +60,10 @@ public class ChatSession implements Runnable {
 
         }
     }
+
     /**
      * Refer action to Chat Room, after received Room Packet with client;'s proper flag.
+     *
      * @param object room packet with flag
      */
     private void updateListing(RoomPacket object) {
@@ -74,6 +74,7 @@ public class ChatSession implements Runnable {
 
     /**
      * Function responsible for reading messages from clients.
+     *
      * @param messagePacket- message received from client
      */
     private void readMessage(MessagePacket messagePacket) {

@@ -2,6 +2,7 @@ package server;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.util.Iterator;
 import java.util.Map;
 
 import static server.ChatRoom.usersInRoom;
@@ -23,14 +24,20 @@ public class Sender {
      */
     protected void sendToAll(Object message) {
         System.out.println("Writing to all...");
-        for (Map.Entry<String, Client> client : clients.entrySet()) {
-            try {
+        Iterator iterator = clients.entrySet().iterator();
+
+        try {
+            while (iterator.hasNext()) {
+
+                Map.Entry<String, Client> client = (Map.Entry) iterator.next();
+
                 writer = client.getValue().getOutputStream();
                 writer.writeObject(message);
                 writer.flush();
-            } catch (Exception ex) {
-                server.hungUp(writer);
+
             }
+        } catch (Exception ex) {
+            server.hungUp(writer);
         }
     }
 
