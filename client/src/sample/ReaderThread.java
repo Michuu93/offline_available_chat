@@ -17,7 +17,7 @@ public class ReaderThread implements Runnable {
     public void run() {
         while (Main.getConnection().getConnectStatus() == Connection.ConnectStatus.CONNECTED) {
             try {
-                if ((received = Main.getConnection().getReader().readObject()) != null) {
+                if (((received = Main.getConnection().getReader().readObject()) != null)) {
                     if (received instanceof MessagePacket) {
                         MessagePacket msg = (MessagePacket) received;
                         System.out.println("Received MessagePacket! Room ID: " + msg.getRoom() + ", Message: " + msg.getMessage());

@@ -15,6 +15,7 @@ import java.util.Map;
 import static server.ChatRoom.generateNickList;
 import static server.ChatRoom.usersInRoom;
 import static server.ClientListener.clients;
+import static server.ClientListener.deliverUserList;
 
 /**
  * @version 1.0
@@ -78,11 +79,15 @@ public class Server {
 
             try {
                 if (writer == client.getValue().getOutputStream()) {
+
                     Client removed = client.getValue();
                     removed.getInputStream().close();
                     writer.close();
                     iterator.remove();
+                    deliverUserList();
+
                 }
+
             } catch (Exception ex) {
 
             }

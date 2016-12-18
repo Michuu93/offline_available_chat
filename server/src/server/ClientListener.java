@@ -25,7 +25,7 @@ public class ClientListener {
     protected static Map<String, Client> clients = new HashMap<>();
     private ObjectInputStream reader;
     private ObjectOutputStream writer;
-    private Sender sender = new Sender();
+    private static Sender sender = new Sender();
 
     /**
      * Constructor with with the given clients input stream and output stream.
@@ -109,7 +109,7 @@ public class ClientListener {
     /**
      * Delivers all users list to client.
      */
-    private void deliverUserList() {
+    protected static void deliverUserList() {
         System.out.println("Sending users list...");
         List<String> usersList = new ArrayList<String>(clients.keySet());
         UsersPacket roomPacket = new UsersPacket(LOUNGE, usersList);
