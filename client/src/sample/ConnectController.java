@@ -36,7 +36,7 @@ public class ConnectController implements Initializable {
         try {
             recentLoad();
             Main.setConnectController(this);
-        } catch (FileNotFoundException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -63,8 +63,9 @@ public class ConnectController implements Initializable {
      *
      * @throws FileNotFoundException
      */
-    private void recentLoad() throws FileNotFoundException {
+    private void recentLoad() throws IOException {
         File recentServer = new File("recentServer.txt");
+        recentServer.createNewFile();
         Scanner reader = new Scanner(recentServer);
         if (reader.hasNextLine()) serverField.setText(reader.nextLine());
         else serverField.setText("127.0.0.1");

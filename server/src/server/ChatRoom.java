@@ -34,6 +34,8 @@ public class ChatRoom {
      */
     protected void loadRooms() {
         String filename = "src\\chatRooms.txt";
+        roomsLog.clear();
+        chatRoomsList.clear();
         try {
             File file = new File(filename);
             BufferedReader reader = new BufferedReader(new FileReader(file));
@@ -56,11 +58,9 @@ public class ChatRoom {
      * @param line- chat room name
      */
     private void initializeLogFile(String line) {
-        roomsLog.clear();
-
         try {
             String filename = line + ".ser";
-            FileOutputStream file = new FileOutputStream(filename, true);
+            FileOutputStream file = new FileOutputStream(filename);
             roomsLog.put(line, file);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -103,7 +103,7 @@ public class ChatRoom {
      *
      * @param room- name of chat room
      */
-    private void generateNickList(String room) {
+    protected static void generateNickList(String room) {
         UsersPacket usersPacket = new UsersPacket(room, usersInRoom.get(room).stream().map(Client::getNick).collect(Collectors.toList()));
         new Sender().sendToUsersInRoom(room, usersPacket);
     }

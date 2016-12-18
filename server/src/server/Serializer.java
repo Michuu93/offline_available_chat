@@ -11,16 +11,15 @@ public class Serializer {
 
     /**
      * Serialiaze objects to given room log file.
-     * @param room chat room name
+     *
+     * @param room   chat room name
      * @param packet message
      */
     protected void serialize(String room, Object packet) {
-
         try {
             FileOutputStream fileOutputStream = roomsLog.get(room);
             ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
             objectOutputStream.writeObject(packet);
-            objectOutputStream.close();
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -30,7 +29,7 @@ public class Serializer {
 
         Iterator iterator = roomsLog.entrySet().iterator();
         while (iterator.hasNext()) {
-            Map.Entry log = (Map.Entry)iterator.next();
+            Map.Entry log = (Map.Entry) iterator.next();
             String room = (String) log.getKey();
             try {
                 Object object;

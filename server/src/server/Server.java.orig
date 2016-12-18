@@ -15,7 +15,6 @@ import java.util.Map;
 import static server.ChatRoom.generateNickList;
 import static server.ChatRoom.usersInRoom;
 import static server.ClientListener.clients;
-import static server.ClientListener.deliverUserList;
 
 /**
  * @version 1.0
@@ -73,26 +72,33 @@ public class Server {
      */
     protected void removeFromList(ObjectOutputStream writer) {
         Iterator iterator = clients.entrySet().iterator();
-
         while (iterator.hasNext()) {
 
             Map.Entry<String, Client> client = (Map.Entry) iterator.next();
 
             try {
+<<<<<<< HEAD
                 if (writer == client.getValue().getOutputStream()) {
-                    iterator.remove();
-                    deliverUserList();
-                    Client removed = client.getValue();
+                    Client removed  = client.getValue();
                     removed.getInputStream().close();
+=======
+                if (stream == (reader = client.getValue().getInputStream())) {
+                    reader.close();
+                    System.out.println(client.getKey() + " is diconnected.");
+                    iterator.remove();
+                } else if (stream == (writer = client.getValue().getOutputStream())) {
+>>>>>>> 0fdce105e6217f6af3d18980a81bdd4d16381531
                     writer.close();
+                    System.out.println(client.getKey() + " is diconnected.");
+                    iterator.remove();
                 }
-
             } catch (Exception ex) {
 
             }
         }
     }
 
+<<<<<<< HEAD
     /**
      * Remove clients from lists of clients in each room.
      *
@@ -117,6 +123,9 @@ public class Server {
             ex.printStackTrace();
         }
     }
+=======
+
+>>>>>>> 0fdce105e6217f6af3d18980a81bdd4d16381531
 
 
     /**

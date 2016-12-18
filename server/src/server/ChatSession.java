@@ -19,7 +19,7 @@ public class ChatSession implements Runnable {
     private Sender sender = new Sender();
 
     protected static final String LOUNGE = "Waiting room";
-    
+
     public ChatSession(ObjectInputStream reader) {
         try {
             this.reader = reader;
@@ -47,23 +47,23 @@ public class ChatSession implements Runnable {
                         readMessage((MessagePacket) object);
                     } else if (object instanceof RoomPacket) {
                         updateListing((RoomPacket) object);
-                    } else {
-                        System.out.println("Sth else - " + object);
                     }
                 }
             } catch (EOFException e) {
                 complete = false;
-                server.hungUp(reader);
+                //server.hungUp(reader);
             } catch (IOException e) {
-                server.hungUp(reader);
+                //server.hungUp(reader);
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
             }
 
         }
     }
+
     /**
      * Refer action to Chat Room, after received Room Packet with client;'s proper flag.
+     *
      * @param object room packet with flag
      */
     private void updateListing(RoomPacket object) {
@@ -74,6 +74,7 @@ public class ChatSession implements Runnable {
 
     /**
      * Function responsible for reading messages from clients.
+     *
      * @param messagePacket- message received from client
      */
     private void readMessage(MessagePacket messagePacket) {
@@ -87,10 +88,10 @@ public class ChatSession implements Runnable {
 
             if (room.equals(LOUNGE)) {
                 sender.sendToAll(messagePacket);
-                //serializer.serialize(LOUNGE, messagePacket);
+                serializer.serialize(LOUNGE, messagePacket);
             } else {
                 sender.sendToUsersInRoom(room, messagePacket);
-                //serializer.serialize(room, messagePacket);
+                serializer.serialize(room, messagePacket);
             }
             System.out.println(messagePacket.getDate() + ": Read message from client from " + room + ": " + messagePacket.getMessage());
         }
